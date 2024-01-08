@@ -191,3 +191,17 @@ bool ManejoFicheros::compararStringConFichero(const std::string& string, const s
         //std::cerr << "Error al comparar el string con el fichero: " << e.what() << std::endl;
     }
 }
+
+std::string ManejoFicheros::extraerString(std::string& cadena, const std::string& dato) {
+    try {
+        std::size_t pos = cadena.find(dato);
+        if (pos != std::string::npos) {
+            cadena.erase(pos, dato.length());
+            return cadena;
+        }
+    } catch (const std::exception& e) {
+        throw std::runtime_error("No se pudo extraer el string");
+        //std::cerr << "Error al extraer el string: " << e.what() << std::endl;
+    }
+    return "";
+}

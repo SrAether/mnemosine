@@ -70,7 +70,10 @@ Ventana::Ventana(QWidget *parent)
     puedoRedimensionarImagenes = true;
 
     // ruta de carpeta
-    nombreCarpeta = "./notas/";
+    nombreCarpeta = "/notas/";
+
+    // ruta de carpeta de configuracion
+    nombreCarpetaConfiguracion = new std::string{"./configuracion/"};
 
     // etiqueta de nombre
     std::string nombre = "Mnemosine";
@@ -774,6 +777,85 @@ void Ventana::verificacionInicial()
     ManejoFicheros fichero;
     // vamos a verificar ficheros por lo que es necesario usar un try catch
     try {
+
+        // verificamos si existe la carpeta de configuracion
+        if (!fichero.existeCarpeta(*nombreCarpetaConfiguracion))
+        {
+            // si no existe la creamos
+            fichero.verificacionInicial(*nombreCarpetaConfiguracion);
+            std::cout << "creando carpeta configuracion" << std::endl;
+
+            // -- BLOQUE DE OBTENCION DE RUTA DE LA CARPETA DE NOTAS -----------------------------------------------------------------------------------------------------------------
+            // generamos un dialogo para pedir la ubicacion de la carpeta de notas
+            QString nombreCarpeta = QFileDialog::getExistingDirectory(this, tr("Por favor seleccione en que ruta le gustaria tener su boveda"), "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+            std::string config;
+            // verificamos si se ingreso un nombre
+            if (!nombreCarpeta.isEmpty())
+            {
+                // creamos el archivo de configuracion
+                config = "rutaCarpetaBoveda: \"" + nombreCarpeta.toStdString();
+                config += "\"\n";
+                //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+            } else {
+                // creamos el archivo de configuracion
+                //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", "./notas/");
+                config = "rutaCarpetaBoveda: \"./\"\n";
+            }
+
+
+            // -- BLOQUE DE OBTENCION DE NOMBRE DE LA CARPETA DE NOTAS -----------------------------------------------------------------------------------------------------------------
+            // generamos un dialogo para pedir el nombre de la carpeta de notas
+            bool ok = false;
+            QString boveda;
+            // ciclo que se sera ejecutado hasta que se ingrese un nombre valido
+            while(!ok)
+            {
+                boveda = QInputDialog::getText(this, "Configuracion", "Nombre de la carpeta de notas:", QLineEdit::Normal, "", &ok);
+                // verificamos si se ingreso un nombre
+                // vamos a crear un un fichero por lo que el nombre no debe contener caracteres especiales
+                if (boveda.contains(QRegularExpression("[\\/:*?\"<>|]") ))
+                {
+                    // mostramos que no se puede crear una nota con ese nombre
+                    //mostrarEtiquetaAccion("No se puede crear una nota con ese nombre");
+                    // mostramos un dialogo de error
+                    QMessageBox::critical(this, "Error", "No se puede crear una nota con ese nombre");
+                    ok = false;
+                }
+            }
+
+            if (ok && !boveda.isEmpty())
+            {
+                // creamos el archivo de configuracion
+                config += "nombreCarpetaBoveda: \"/" + boveda.toStdString() + "/\"\n";
+                fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+            } else {
+                // creamos el archivo de configuracion
+                config += "nombreCarpetaBoveda: \"notas/\"\n";
+                fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+            }
+        }
+
+        // luego leemos el archivo de configuracion
+        std::string configuracion = fichero.leerFichero(*nombreCarpetaConfiguracion + "configuracion.tak");
+
+        // -- BLOQUE DE OBTENCION DE LA RUTA DE LA CARPETA DE NOTAS --
+        // luego obtenemos el nombre de la carpeta de notas
+        rutaCarpetaNotas = fichero.extraerString(configuracion, "rutaCarpetaBoveda: \"");
+        // tomamos el contenido de configuración hasta el salto de linea
+        rutaCarpetaNotas = rutaCarpetaNotas.substr(0, rutaCarpetaNotas.find("\""));
+        //std::cout << "rutaCarpetaNotas: " << rutaCarpetaNotas << std::endl;
+
+
+        // -- BLOQUE DE OBTENCION DEL NOMBRE DE LA CARPETA DE NOTAS --
+        // Obtenemos el nombre de la carpeta de notas
+        nombreCarpeta = fichero.extraerString(configuracion, rutaCarpetaNotas + "\"\nnombreCarpetaBoveda: \"");
+        nombreCarpeta = nombreCarpeta.substr(0, nombreCarpeta.find("\""));
+        //std::cout << "nombreCarpeta: " << nombreCarpeta << std::endl;
+
+        // unimos la ruta de la carpeta de notas con el nombre de la carpeta de notas
+        nombreCarpeta = rutaCarpetaNotas + nombreCarpeta;
+        std::cout << "nombreCarpeta: " << nombreCarpeta << std::endl;
+
         if (!fichero.existeCarpeta(nombreCarpeta))
         {
             // si no existe la creamos
@@ -957,11 +1039,6 @@ void Ventana::keyPressEvent(QKeyEvent *event){
 
 
 }
-
-
-
-
-
 
 
 void Ventana::cambiarFuente()

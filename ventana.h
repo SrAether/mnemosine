@@ -28,6 +28,12 @@ private:
     QFont *fuente;
     // agregamos el nombre de la carpeta donde se guardaran las notas
     std::string nombreCarpeta;
+
+    // agregamos el nombre de la carpeta de configuracion
+    std::string* nombreCarpetaConfiguracion;
+    // ruta de la carpeta de notas
+    std::string rutaCarpetaNotas;
+
     // primero un frame que contendra toda la ventana
     QFrame *frame;
     // luego un frame que contendra el menu

@@ -15,5 +15,6 @@ public:
     void verificacionInicial(const std::string& nombreCarpeta);
     void copiarFichero(const std::string& origen, const std::string& destino);
     bool compararStringConFichero(const std::string& string, const std::string& fichero);
+    std::string extraerString(std::string& cadena, const std::string& dato);
 };
 #endif // MANEJOFICHEROS_H
