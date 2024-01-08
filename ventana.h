@@ -9,7 +9,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 // para sonido del boton
-
+#include <QtMultimedia/QMediaPlayer>
 /*
 El objetivo de la clase es crear la ventana principal de mi app de notas.
 como tal tendra un frame que contiene el menu, y otro frame que contiene el contenido
@@ -69,8 +69,8 @@ private:
     QPixmap *iconoCambiarColorFondo;
     // tamaño de los botones
     int tamBoton;
-    // sonido del boton QSound *sonidoBoton;
-
+    // sonido del boton
+    QMediaPlayer *sonidoBoton;
 
 
 
@@ -97,6 +97,7 @@ private:
     // booleano que me indica si puedo o no redimencionar una imagen
     bool puedoRedimensionarImagenes;
 
+
 public:
     explicit Ventana(QWidget *parent = nullptr);
     ~Ventana();
@@ -118,8 +119,10 @@ private slots:
 
 signals:
 
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
+
 };
 
 #endif // VENTANA_H

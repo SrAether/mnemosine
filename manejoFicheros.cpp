@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <filesystem>
+#include <algorithm>
 
 ManejoFicheros::ManejoFicheros()
 {
@@ -45,36 +46,78 @@ std::string ManejoFicheros::leerFichero(std::string nombreFichero)
     return texto;
 }
 
-std::vector<std::string> ManejoFicheros::extraerFicheros(std::string nombreCarpeta)
-{
+// std::vector<std::string> ManejoFicheros::extraerFicheros(std::string nombreCarpeta)
+// {
+//     std::vector<std::string> archivos;
+
+//     // Leemos la carpeta ficheros y guardamos los nombres de todos los archivos
+//     // creamos un puntero DIR
+//     DIR *dir; // puntero a la carpeta
+//     struct dirent *ent; // estructura para los elementos dentro de la carpeta
+
+//     // Abrimos la carpeta
+//     dir = opendir(nombreCarpeta.c_str());
+//     if (dir == nullptr)
+//     {
+//         throw std::runtime_error("No se pudo abrir la carpeta");
+//     }
+//     // Lee los archivos dentro de la carpeta
+//     while ((ent = readdir(dir)) != nullptr) {
+//         std::string nombreArchivo = ent->d_name;
+
+//         // Ignora los directorios "." y ".."
+//         if (nombreArchivo != "." && nombreArchivo != "..") {
+//             archivos.push_back(nombreArchivo);
+//         }
+//     }
+
+//     // Cerramos la carpeta
+//     closedir(dir);
+
+//     return archivos;
+
+// }
+
+
+bool compararFechas(const std::string &archivo1, const std::string &archivo2, const std::string &nombreCarpeta) {
+    struct stat atributos1, atributos2;
+    std::string rutaArchivo1 = nombreCarpeta + "/" + archivo1;
+    std::string rutaArchivo2 = nombreCarpeta + "/" + archivo2;
+
+    stat(rutaArchivo1.c_str(), &atributos1);
+    stat(rutaArchivo2.c_str(), &atributos2);
+
+    return atributos1.st_mtime < atributos2.st_mtime;
+}
+
+std::vector<std::string> ManejoFicheros::extraerFicheros(std::string nombreCarpeta) {
     std::vector<std::string> archivos;
 
     // Leemos la carpeta ficheros y guardamos los nombres de todos los archivos
-    // creamos un puntero DIR
-    DIR *dir; // puntero a la carpeta
-    struct dirent *ent; // estructura para los elementos dentro de la carpeta
+    DIR *dir;
+    struct dirent *ent;
 
-    // Abrimos la carpeta
     dir = opendir(nombreCarpeta.c_str());
-    if (dir == nullptr)
-    {
+    if (dir == nullptr) {
         throw std::runtime_error("No se pudo abrir la carpeta");
     }
-    // Lee los archivos dentro de la carpeta
+
     while ((ent = readdir(dir)) != nullptr) {
         std::string nombreArchivo = ent->d_name;
 
-        // Ignora los directorios "." y ".."
         if (nombreArchivo != "." && nombreArchivo != "..") {
             archivos.push_back(nombreArchivo);
         }
     }
 
-    // Cerramos la carpeta
     closedir(dir);
 
-    return archivos;
+    // Ordenar los archivos por fecha de creación
+    std::sort(archivos.begin(), archivos.end(), [nombreCarpeta](const std::string &a, const std::string &b) {
+        return compararFechas(a, b, nombreCarpeta);
+    });
 
+    return archivos;
 }
 
 
@@ -122,9 +165,12 @@ void ManejoFicheros::verificacionInicial(const std::string& nombreCarpeta) {
 
 void ManejoFicheros::copiarFichero(const std::string& origen, const std::string& destino) {
     try {
-        std::filesystem::copy_file(origen, destino, std::filesystem::copy_options::overwrite_existing);
+        //std::filesystem::copy_file(origen, destino, std::filesystem::copy_options::overwrite_existing);
         //std::cout << "Archivo copiado de " << origen << " a " << destino << std::endl;
         // cerramos el fichero
+
+        // copiamos el archivo
+        std::filesystem::copy(origen, destino, std::filesystem::copy_options::overwrite_existing);
 
     } catch (const std::exception& e) {
         throw std::runtime_error("No se pudo copiar el fichero");

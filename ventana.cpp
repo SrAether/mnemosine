@@ -51,6 +51,9 @@
 #include <QPixmap>
 #include <QDebug>
 
+// para sonido
+#include <QtMultimedia/QMediaPlayer>
+
 
 Ventana::Ventana(QWidget *parent)
     : QWidget{parent}
@@ -241,6 +244,10 @@ Ventana::Ventana(QWidget *parent)
     iconoCambiarColor = new QPixmap{"./iconos/botonCambiarColor.png"};
     iconoCambiarColorFondo = new QPixmap{"./iconos/botonCambiarColorFondo.png"};
 
+
+
+
+
     // fijamos el tamaño de los botones (iconos de los mismos)
     tamBoton = 50;
 
@@ -253,7 +260,7 @@ Ventana::Ventana(QWidget *parent)
     botonOcultar->setIcon(QIcon{*iconoOcultar});
     botonOcultar->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonOcultar->setMaximumSize(tamBoton, tamBoton);
-    botonOcultar->setToolTip("Boton para ocultar la lista de notas /n Ctrl + O");
+    botonOcultar->setToolTip("Ocultar lista de notas \n Ctrl + O");
 
     // boton mostrar
     botonMostrar = new QPushButton{frameContenido};
@@ -262,7 +269,7 @@ Ventana::Ventana(QWidget *parent)
     botonMostrar->setIcon(QIcon{*iconoMostrar});
     botonMostrar->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonMostrar->setMaximumSize(tamBoton, tamBoton);
-    botonMostrar->setToolTip("Boton para mostrar la lista de notas /n Ctrl + M");
+    botonMostrar->setToolTip("Mostrar lista de notas \n Ctrl + M");
     botonMostrar->hide();
 
 
@@ -273,7 +280,7 @@ Ventana::Ventana(QWidget *parent)
     botonNuevaNota->setIcon(QIcon{*iconoNuevaNota});
     botonNuevaNota->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonNuevaNota->setMaximumSize(tamBoton, tamBoton);
-    botonNuevaNota->setToolTip("Boton para crear una nueva nota /n Ctrl + N");
+    botonNuevaNota->setToolTip("Nueva nota \n Ctrl + N");
 
     // boton guardar nota
     botonGuardarNota = new QPushButton{frameMenu};
@@ -282,7 +289,7 @@ Ventana::Ventana(QWidget *parent)
     botonGuardarNota->setIcon(QIcon{*iconoGuardarNota});
     botonGuardarNota->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonGuardarNota->setMaximumSize(tamBoton, tamBoton);
-    botonGuardarNota->setToolTip("Boton para guardar la nota /n Ctrl + S");
+    botonGuardarNota->setToolTip("Guardar \n Ctrl + S");
 
     // boton guardar nota 2
     botonGuardarNota2 = new QPushButton{frameContenido};
@@ -291,7 +298,7 @@ Ventana::Ventana(QWidget *parent)
     botonGuardarNota2->setIcon(QIcon{*iconoGuardarNota});
     botonGuardarNota2->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonGuardarNota2->setMaximumSize(tamBoton, tamBoton);
-    botonGuardarNota2->setToolTip("Boton para guardar la nota /n Ctrl + S");
+    botonGuardarNota2->setToolTip("Guardar \n Ctrl + S");
     botonGuardarNota2->hide();
 
     // boton eliminar nota
@@ -301,7 +308,7 @@ Ventana::Ventana(QWidget *parent)
     botonEliminarNota->setIcon(QIcon{*iconoEliminarNota});
     botonEliminarNota->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonEliminarNota->setMaximumSize(tamBoton, tamBoton);
-    botonEliminarNota->setToolTip("Boton para eliminar la nota /n Ctrl + E");
+    botonEliminarNota->setToolTip("Eliminar nota \n Ctrl + E");
 
     // boton eliminar nota 2
     botonEliminarNota2 = new QPushButton{frameContenido};
@@ -310,7 +317,7 @@ Ventana::Ventana(QWidget *parent)
     botonEliminarNota2->setIcon(QIcon{*iconoEliminarNota});
     botonEliminarNota2->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonEliminarNota2->setMaximumSize(tamBoton, tamBoton);
-    botonEliminarNota2->setToolTip("Boton para eliminar la nota /n Ctrl + E");
+    botonEliminarNota2->setToolTip("Eliminar nota \n Ctrl + E");
     botonEliminarNota2->hide();
 
     // boton para agregar imagen
@@ -320,7 +327,7 @@ Ventana::Ventana(QWidget *parent)
     botonAgregarImagen->setIcon(QIcon{*iconoAgregarImagen});
     botonAgregarImagen->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonAgregarImagen->setMaximumSize(tamBoton, tamBoton);
-    botonAgregarImagen->setToolTip("Boton para agregar una imagen /n Ctrl + I");
+    botonAgregarImagen->setToolTip("Insertar imagen \n Ctrl + I");
 
     // boton para agregar imagen 2
     botonAgregarImagen2 = new QPushButton{frameContenido};
@@ -329,7 +336,7 @@ Ventana::Ventana(QWidget *parent)
     botonAgregarImagen2->setIcon(QIcon{*iconoAgregarImagen});
     botonAgregarImagen2->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonAgregarImagen2->setMaximumSize(tamBoton, tamBoton);
-    botonAgregarImagen2->setToolTip("Boton para agregar una imagen /n Ctrl + I");
+    botonAgregarImagen2->setToolTip("Insertar imagen \n Ctrl + I");
     botonAgregarImagen2->hide();
 
     // boton para cambiar tipo de texto
@@ -339,7 +346,7 @@ Ventana::Ventana(QWidget *parent)
     botonCambiarFuente->setIcon(QIcon{*iconoCambiarFuente});
     botonCambiarFuente->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonCambiarFuente->setMaximumSize(tamBoton, tamBoton);
-    botonCambiarFuente->setToolTip("Boton para cambiar el tipo de texto /n Ctrl + F");
+    botonCambiarFuente->setToolTip("Tipo de fuente \n Ctrl + F");
     botonCambiarFuente->hide();
 
     // boton para cambiar color de texto
@@ -349,7 +356,7 @@ Ventana::Ventana(QWidget *parent)
     botonCambiarColor->setIcon(QIcon{*iconoCambiarColor});
     botonCambiarColor->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonCambiarColor->setMaximumSize(tamBoton, tamBoton);
-    botonCambiarColor->setToolTip("Boton para cambiar el color de texto /n Ctrl + G");
+    botonCambiarColor->setToolTip("Color de texto \n Ctrl + G");
     botonCambiarColor->hide();
 
     // boton para cambiar color de fondo
@@ -359,7 +366,7 @@ Ventana::Ventana(QWidget *parent)
     botonCambiarColorFondo->setIcon(QIcon{*iconoCambiarColorFondo});
     botonCambiarColorFondo->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonCambiarColorFondo->setMaximumSize(tamBoton, tamBoton);
-    botonCambiarColorFondo->setToolTip("Boton para cambiar el color de fondo /n Ctrl + H");
+    botonCambiarColorFondo->setToolTip("Resaltar texto \n Ctrl + H");
     botonCambiarColorFondo->hide();
 
 
@@ -467,27 +474,19 @@ Ventana::Ventana(QWidget *parent)
     connect(botonCambiarFuente, SIGNAL(clicked()), this, SLOT(cambiarFuente()));
     connect(botonCambiarColor, SIGNAL(clicked()), this, SLOT(cambiarColor()));
     connect(botonCambiarColorFondo, SIGNAL(clicked()), this, SLOT(cambiarColorFondo()));
+
+
     // actualizamos la lista de notas
     verificacionInicial();
     actualizarListaNotas();
 
 
-
-
-
-
-
-
 }
+
 
 void Ventana::ocultarMenu()
 {
-    // guardamos la posicion del cursor de la nota
-    //QTextCursor cursor = contenidoNota->textCursor();
-    // guardamos la posicion del scroll
-    // scroll = contenidoNota->verticalScrollBar();
-    // guardamos el formato del texto
-    //QTextCharFormat formato = contenidoNota->currentCharFormat();
+
     // ocultamos el menu
     frameMenu->hide();
     // frameContenido->setGeometry(0, 0, 1860, 1080);
@@ -510,12 +509,6 @@ void Ventana::ocultarMenu()
     }
     redimensionarImagenes();
 
-    // volvemos a colocar el cursor en la nota
-    //contenidoNota->setTextCursor(cursor);
-    // volvemos a colocar el formato
-   // contenidoNota->setCurrentCharFormat(formato);
-
-    // regresamos el foco a la nota
     contenidoNota->setFocus();
 
 
@@ -523,10 +516,6 @@ void Ventana::ocultarMenu()
 
 void Ventana::mostrarMenu()
 {
-    // guardamos la posicion del cursor de la nota
-    //QTextCursor cursor = contenidoNota->textCursor();
-    // extraemos la posicion del cursor
-    //int posicionCursor = contenidoNota->textCursor().position();
 
     // mostramos el menu
     frameMenu->show();
@@ -540,22 +529,13 @@ void Ventana::mostrarMenu()
     botonCambiarFuente->hide();
     botonCambiarColor->hide();
     botonCambiarColorFondo->hide();
-    // redimensionamos las imagenes despues de 200 milisegundos
-    //QTimer::singleShot(200, this, SLOT(redimensionarImagenes()));
+    // redimensionamos las imagenes
     redimensionarImagenes();
-    //std::cout << "Imagen redimensionada \n";
 
-
-    // volvemos a colocar el cursor en la nota
-    //contenidoNota->setTextCursor(cursor);
 
     // regresamos el foco a la nota
     contenidoNota->setFocus();
 
-
-
-    // luego colocamos la posicion del cursor
-    //contenidoNota->textCursor().setPosition(posicionCursor);
 }
 
 void Ventana::nuevaNota()
@@ -563,42 +543,86 @@ void Ventana::nuevaNota()
     // primero pedimos el nombre de la nota
     bool ok;
     QString nombreNota = QInputDialog::getText(this, "Nueva Nota", "Nombre de la nota:", QLineEdit::Normal, "", &ok);
-    if (ok && !nombreNota.isEmpty())
-    {
-        // creamos una carpeta con el nombre de la nota dentro de esta guardaremos la nota y los archivos relacionados a la misma
-        ManejoFicheros fichero;
-        fichero.verificacionInicial(nombreCarpeta + nombreNota.toStdString());
 
-        // luego creamos la nota
-        fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak" , "");
-        // luego actualizamos la lista de notas
-        actualizarListaNotas();
-        // luego seleccionamos la nota
-        // actualizamos el current item de la lista
-        listaNotas->setCurrentRow(0);
-        // luego seleccionamos la nota
-        seleccionarNota();
-        // damos el foco a la nota
-        contenidoNota->setFocus();
+
+    // es necesario tener un control de excepciones para evitar cierres inesperados
+    try
+    {
+        // debido a que se va a crear una carpeta y un fichero es necesario verificar que el nombre no contenga caracteres especiales
+        // verificamos si el nombre contiene caracteres especiales
+        //if (nombreNota.contains(QRegExp("[\\/:*?\"<>|]")))
+        if (nombreNota.contains(QRegularExpression("[\\/:*?\"<>|]") ))
+        {
+            // mostramos que no se puede crear una nota con ese nombre
+            mostrarEtiquetaAccion("No se puede crear una nota con ese nombre");
+            return;
+        }
+
+
+        if (ok && !nombreNota.isEmpty())
+        {
+            // verificamos si no existe una nota con el mismo nombre
+            ManejoFicheros fichero;
+
+            if (fichero.existeCarpeta(nombreCarpeta + nombreNota.toStdString()))
+            {
+                // mostramos que ya existe una nota con el mismo nombre
+                mostrarEtiquetaAccion("Ya existe una nota con el mismo nombre");
+                return;
+            }
+
+            // creamos una carpeta con el nombre de la nota dentro de esta guardaremos la nota y los archivos relacionados a la misma
+
+            fichero.verificacionInicial(nombreCarpeta + nombreNota.toStdString());
+
+            // luego creamos la nota
+            fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak" , "");
+            // luego actualizamos la lista de notas
+            actualizarListaNotas();
+            // luego seleccionamos la nota
+            // actualizamos el current item de la lista
+            listaNotas->setCurrentRow(0);
+            // luego seleccionamos la nota
+            seleccionarNota();
+            // damos el foco a la nota
+            contenidoNota->setFocus();
+        }
+
     }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+        mostrarEtiquetaAccion("Error al crear la nota");
+    }
+
+
+
 }
 
 void Ventana::actualizarListaNotas()
 {
-    // primero limpiamos la lista
-    listaNotas->clear();
-    // luego la actualizamos
-    ManejoFicheros fichero;
-    std::vector<std::string> notas = fichero.extraerFicheros(nombreCarpeta);
-    // for (const std::string &nota : notas)
-    // {
-    //     listaNotas->addItem(QString::fromStdString(nota));
-    // }
-    // recorremos el arreglo de notas en orden decendente
-    for (int i = notas.size() - 1; i >= 0; i--)
+    // vamos a verificar ficheros por lo que es necesario usar un try catch
+    try {
+        // primero limpiamos la lista
+        listaNotas->clear();
+        // luego la actualizamos
+        ManejoFicheros fichero;
+        std::vector<std::string> notas = fichero.extraerFicheros(nombreCarpeta);
+        // for (const std::string &nota : notas)
+        // {
+        //     listaNotas->addItem(QString::fromStdString(nota));
+        // }
+        // recorremos el arreglo de notas en orden decendente
+        for (int i = notas.size() - 1; i >= 0; i--)
+        {
+            listaNotas->addItem(QString::fromStdString(notas[i]));
+        }
+    } catch (const std::exception &e)
     {
-        listaNotas->addItem(QString::fromStdString(notas[i]));
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
     }
+
 }
 
 
@@ -611,18 +635,26 @@ void Ventana::guardarNota()
         mostrarEtiquetaAccion("No hay una nota que guardar");
         return;
     }
+    // vamos a verificar ficheros por lo que es necesario usar un try catch
+    try {
 
-    // Primero obtenemos el nombre de la nota seleccionada
-    QString nombreNota = listaNotas->currentItem()->text();
+        // Primero obtenemos el nombre de la nota seleccionada
+        QString nombreNota = listaNotas->currentItem()->text();
 
-    // Luego obtenemos el contenido de la nota en formato HTML
-    QString contenido = contenidoNota->toHtml();
+        // Luego obtenemos el contenido de la nota en formato HTML
+        QString contenido = contenidoNota->toHtml();
 
-    // Luego guardamos la nota
-    ManejoFicheros fichero;
-    //fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString(), contenido.toStdString());
-    fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak", contenido.toStdString());
-    mostrarEtiquetaAccion("Nota guardada");
+        // Luego guardamos la nota
+        ManejoFicheros fichero;
+        //fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString(), contenido.toStdString());
+        fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak", contenido.toStdString());
+        mostrarEtiquetaAccion("Nota guardada");
+    } catch (const std::exception &e)
+    {
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
+    }
+
 }
 
 
@@ -636,39 +668,47 @@ void Ventana::eliminarNota()
         return;
     }
 
-    // obtenemos el nombre de la nota seleccionada
-    QString nombreNota = listaNotas->currentItem()->text();
-    // verificamos si nombreNota contiene algun valor
-    if (nombreNota.isEmpty())
-    {
-        // no hay una nota seleccionada
-        mostrarEtiquetaAccion("No hay una nota que eliminar");
-        return;
-    }
-    else
-    {
-        // preguntamos si esta seguro de eliminar la nota
-        QMessageBox::StandardButton respuesta;
-        //respuesta = QMessageBox::question(this, "Eliminar Nota", "¿Esta seguro de eliminar la nota? ", QMessageBox::Yes | QMessageBox::No);
-        // preguntamos si queremos eliminar la nota y mencionamos el nombre de la misma
-        respuesta = QMessageBox::question(this, "Eliminar Nota", "¿Esta seguro de eliminar la nota \"" + nombreNota + "\"?", QMessageBox::Yes | QMessageBox::No);
-        if (respuesta == QMessageBox::No)
+    // puesto que vamos a eliminar ficheros es necesario hacerlo dentro de un try catch
+    try {
+        // obtenemos el nombre de la nota seleccionada
+        QString nombreNota = listaNotas->currentItem()->text();
+        // verificamos si nombreNota contiene algun valor
+        if (nombreNota.isEmpty())
         {
+            // no hay una nota seleccionada
+            mostrarEtiquetaAccion("No hay una nota que eliminar");
             return;
         }
+        else
+        {
+            // preguntamos si esta seguro de eliminar la nota
+            QMessageBox::StandardButton respuesta;
+            //respuesta = QMessageBox::question(this, "Eliminar Nota", "¿Esta seguro de eliminar la nota? ", QMessageBox::Yes | QMessageBox::No);
+            // preguntamos si queremos eliminar la nota y mencionamos el nombre de la misma
+            respuesta = QMessageBox::question(this, "Eliminar Nota", "¿Esta seguro de eliminar la nota \n \"" + nombreNota + "\"?", QMessageBox::Yes | QMessageBox::No);
+            if (respuesta == QMessageBox::No)
+            {
+                return;
+            }
 
-        // luego eliminamos la nota
-        ManejoFicheros fichero;
-        fichero.eliminarFichero(nombreCarpeta + nombreNota.toStdString()/* + ".txt"*/);
-        // luego actualizamos la lista de notas
-        actualizarListaNotas();
-        // actualizamos la nota actual
-        nombreNotaActual = "";
-        // luego borramos el area de texto
-        contenidoNota->clear();
-        // luego mostramos la accion
-        mostrarEtiquetaAccion("Nota eliminada");
+            // luego eliminamos la nota
+            ManejoFicheros fichero;
+            fichero.eliminarFichero(nombreCarpeta + nombreNota.toStdString()/* + ".txt"*/);
+            // luego actualizamos la lista de notas
+            actualizarListaNotas();
+            // actualizamos la nota actual
+            nombreNotaActual = "";
+            // luego borramos el area de texto
+            contenidoNota->clear();
+            // luego mostramos la accion
+            mostrarEtiquetaAccion("Nota eliminada");
+        }
+    } catch (const std::exception &e)
+    {
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
     }
+
 
 }
 
@@ -681,69 +721,85 @@ void Ventana::seleccionarNota()
         mostrarEtiquetaAccion("No hay una nota seleccionada");
         return;
     }
-    // primero obtenemos el nombre de la nota seleccionada
-    QString nombreNota = listaNotas->currentItem()->text();
+    // vamos a verificar ficheros por lo que es necesario usar un try catch
+    try {
+        // primero obtenemos el nombre de la nota seleccionada
+        QString nombreNota = listaNotas->currentItem()->text();
 
-    // vamos a verificar si hubo cambios en la nota actual para guardarlos, si los hubo
-    // primero verificamos que la nota actual no este vacia
-    if (contenidoNota->toHtml() != "")
-    {
-        // verificamos si no es la primera entrada ya que en esta nombreNotaActual esta vacia
-        if (nombreNotaActual != "")
+        // vamos a verificar si hubo cambios en la nota actual para guardarlos, si los hubo
+        // primero verificamos que la nota actual no este vacia
+        if (contenidoNota->toHtml() != "")
         {
-            // verificamos si se modifico la nota actual
-            ManejoFicheros fichero;
-            if (!fichero.compararStringConFichero(contenidoNota->toHtml().toStdString(), (nombreCarpeta + nombreNotaActual.toStdString() + "/" + nombreNotaActual.toStdString() + ".tak")))
+            // verificamos si no es la primera entrada ya que en esta nombreNotaActual esta vacia
+            if (nombreNotaActual != "")
             {
-                // mostramos en consola que deberiamos guardar la nota
-                std::cout << "deberiamos guardar la nota" << std::endl;
-                // luego guardamos la nota
-                fichero.escribirFichero(nombreCarpeta + nombreNotaActual.toStdString() + "/" + nombreNotaActual.toStdString() + ".tak", contenidoNota->toHtml().toStdString());
+                // verificamos si se modifico la nota actual
+                ManejoFicheros fichero;
+                if (!fichero.compararStringConFichero(contenidoNota->toHtml().toStdString(), (nombreCarpeta + nombreNotaActual.toStdString() + "/" + nombreNotaActual.toStdString() + ".tak")))
+                {
+                    // mostramos en consola que deberiamos guardar la nota
+                    std::cout << "deberiamos guardar la nota" << std::endl;
+                    // luego guardamos la nota
+                    fichero.escribirFichero(nombreCarpeta + nombreNotaActual.toStdString() + "/" + nombreNotaActual.toStdString() + ".tak", contenidoNota->toHtml().toStdString());
+                }
             }
         }
+
+
+        // Actualizamos el nombre de la nota actual
+        nombreNotaActual = nombreNota;
+        // mostramos el nombre en consola
+        std::cout << nombreNota.toStdString() << std::endl;
+        // luego obtenemos el contenido de la nota
+        ManejoFicheros fichero;
+        //std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() /*+ ".txt"*/);
+        std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak");
+        // luego mostramos el contenido de la nota
+        //contenidoNota->setText(QString::fromStdString(contenido));
+        contenidoNota->setHtml(QString::fromStdString(contenido));
+        // luego mostramos la accion
+        mostrarEtiquetaAccion("Nota seleccionada");
+        // redimensionamos las imagenes de la nota
+        redimensionarImagenes();
+    } catch (const std::exception &e)
+    {
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
     }
-
-
-    // Actualizamos el nombre de la nota actual
-    nombreNotaActual = nombreNota;
-    // mostramos el nombre en consola
-    std::cout << nombreNota.toStdString() << std::endl;
-    // luego obtenemos el contenido de la nota
-    ManejoFicheros fichero;
-    //std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() /*+ ".txt"*/);
-    std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak");
-    // luego mostramos el contenido de la nota
-    //contenidoNota->setText(QString::fromStdString(contenido));
-    contenidoNota->setHtml(QString::fromStdString(contenido));
-    // luego mostramos la accion
-    mostrarEtiquetaAccion("Nota seleccionada");
-    // redimensionamos las imagenes de la nota
-    redimensionarImagenes();
 }
 
 void Ventana::verificacionInicial()
 {
     // verificamos si existe la carpeta notas
     ManejoFicheros fichero;
-    if (!fichero.existeCarpeta(nombreCarpeta))
-    {
-        // si no existe la creamos
-        fichero.verificacionInicial(nombreCarpeta);
-        std::cout << "creando carpeta contenedor" << std::endl;
-        // y creamos una nota que explica los comandos basicos
-        // primero creamos la carpeta de la nota
-        fichero.verificacionInicial(nombreCarpeta + "comandosBasicos");
-        // luego creamos la nota
-        //fichero.escribirFichero(nombreCarpeta + "comandosBasicos/comandosBasicos.tak" , "Comandos Basicos: \n\nCtrl + S: Guardar nota\nCtrl + N: Crear nueva nota\nCtrl + E: Eliminar nota\nCtrl + I: Insertar imagen\nCtrl + Q: Salir de la aplicacion\nCtrl + O: Ocultar menu\nCtrl + M: Mostrar menu\nCtrl + A: Seleccionar todo\nCtrl + Z: Deshacer");
-        fichero.escribirFichero(nombreCarpeta + "comandosBasicos/comandosBasicos.tak" , "<h1>Comandos Basicos:</h1><br><br><h2>Ctrl + S: Guardar nota</h2><br><h2>Ctrl + N: Crear nueva nota</h2><br><h2>Ctrl + E: Eliminar nota</h2><br><h2>Ctrl + I: Insertar imagen</h2><br><h2>Ctrl + Q: Salir de la aplicacion</h2><br><h2>Ctrl + O: Ocultar menu</h2><br><h2>Ctrl + M: Mostrar menu</h2><br><h2>Ctrl + A: Seleccionar todo</h2><br><h2>Ctrl + B: Negritas</h2><br><h2>Ctrl + Z: Deshacer</h2>");
+    // vamos a verificar ficheros por lo que es necesario usar un try catch
+    try {
+        if (!fichero.existeCarpeta(nombreCarpeta))
+        {
+            // si no existe la creamos
+            fichero.verificacionInicial(nombreCarpeta);
+            //std::cout << "creando carpeta contenedor" << std::endl;
+            QMessageBox::information(this, "Bienvenido", "Bienvenido a Mnemosine\n\nPara comenzar cree una nueva nota");
+            // y creamos una nota que explica los comandos basicos
+            // primero creamos la carpeta de la nota
+            //fichero.verificacionInicial(nombreCarpeta + "comandosBasicos");
+            // luego creamos la nota
+            //fichero.escribirFichero(nombreCarpeta + "comandosBasicos/comandosBasicos.tak" , "Comandos Basicos: \n\nCtrl + S: Guardar nota\nCtrl + N: Crear nueva nota\nCtrl + E: Eliminar nota\nCtrl + I: Insertar imagen\nCtrl + Q: Salir de la aplicacion\nCtrl + O: Ocultar menu\nCtrl + M: Mostrar menu\nCtrl + A: Seleccionar todo\nCtrl + Z: Deshacer");
+            //fichero.escribirFichero(nombreCarpeta + "comandosBasicos/comandosBasicos.tak" , "<h1>Comandos Basicos:</h1><br><br><h2>Ctrl + S: Guardar nota</h2><br><h2>Ctrl + N: Crear nueva nota</h2><br><h2>Ctrl + E: Eliminar nota</h2><br><h2>Ctrl + I: Insertar imagen</h2><br><h2>Ctrl + Q: Salir de la aplicacion</h2><br><h2>Ctrl + O: Ocultar menu</h2><br><h2>Ctrl + M: Mostrar menu</h2><br><h2>Ctrl + A: Seleccionar todo</h2><br><h2>Ctrl + B: Negritas</h2><br><h2>Ctrl + Z: Deshacer</h2>");
 
-    } else {
-        std::cout << "Se encontro un contenedor" << std::endl;
+        } else {
+            std::cout << "Se encontro un contenedor" << std::endl;
+        }
+    } catch (const std::exception &e)
+    {
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
     }
 }
 
 void Ventana::insertarImagen()
 {
+
     // verificamos si nos encontramos dentro de un archivo de texto
     if (listaNotas->currentItem() == nullptr)
     {
@@ -759,75 +815,81 @@ void Ventana::insertarImagen()
 
     // mostramos en la terminal que estamos intentando insertar una imagen
     std::cout << "insertando imagen" << std::endl;
-    // obtenemos la ruta de la imagen
-    QString rutaImagen = QFileDialog::getOpenFileName(this, tr("Abrir Archivo"), "/home", tr("Images (*.png *.xpm *.jpg)"));
-    // si la ruta a la imagen no esta vacia
-    if (!rutaImagen.isEmpty())
+
+    // preparamos un bloque de excepcion para capturar errores
+    try
     {
-
-
-        // hacemos una copia de la imagen en la carpeta de la nota
-        // primero obtenemos el nombre de la nota seleccionada
-        QString nombreNota = listaNotas->currentItem()->text();
-        // luego verificamos que nombreNota no este vacio
-        if (nombreNota.isEmpty())
+        // obtenemos la ruta de la imagen
+        QString rutaImagen = QFileDialog::getOpenFileName(this, tr("Abrir Archivo"), "/home", tr("Images (*.png *.xpm *.jpg)"));
+        // si la ruta a la imagen no esta vacia
+        if (!rutaImagen.isEmpty())
         {
-            return;
+
+
+            // hacemos una copia de la imagen en la carpeta de la nota
+            // primero obtenemos el nombre de la nota seleccionada
+            QString nombreNota = listaNotas->currentItem()->text();
+            // luego verificamos que nombreNota no este vacio
+            if (nombreNota.isEmpty())
+            {
+                return;
+            }
+            // luego verificamos que exista la carpeta nota
+            ManejoFicheros fichero;
+            if (!fichero.existeCarpeta(nombreCarpeta + nombreNota.toStdString()))
+            {
+                // si no existe la creamos
+                fichero.verificacionInicial(nombreCarpeta + nombreNota.toStdString());
+                std::cout << "creando carpeta nota" << std::endl;
+                // y creamos una nota
+                fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak" , "");
+            } else {
+                std::cout << "Se encontro una nota" << std::endl;
+            }
+            // luego copiamos la imagen
+            fichero.copiarFichero(rutaImagen.toStdString(), nombreCarpeta + nombreNota.toStdString() + "/" + rutaImagen.split("/").last().toStdString());
+
+            // Insertar la imagen usando un formato de imagen HTML
+            // Obtener la ruta completa de la imagen
+            QString imagePath = (nombreCarpeta + nombreNota.toStdString() + "/" + rutaImagen.split("/").last().toStdString()).c_str();
+
+            // Especificar la anchura deseada (ajustar según tus necesidades)
+            int anchuraDeseada = 300; // por ejemplo, ajusta este valor según tus necesidades
+
+            // Crear la etiqueta de imagen con la ruta y la anchura
+            QString htmlImage = QString("<img src='%1' width='%2'/>").arg(imagePath).arg(anchuraDeseada);
+            std::cout << htmlImage.toStdString() << std::endl;
+            // Insertar la imagen usando el formato de imagen HTML
+            contenidoNota->textCursor().insertHtml(htmlImage);
+            // Insertar la imagen usando el formato de imagen HTML
+            //contenidoNota->textCursor().insertHtml(htmlImage);
+
+            // Opcionalmente, podrías querer añadir un salto de línea después de la imagen
+            contenidoNota->textCursor().insertHtml("<br>");
+
+            // restauramos el estilo de texto
+            contenidoNota->setCurrentCharFormat(formatoActual);
         }
-        // luego verificamos que exista la carpeta nota
-        ManejoFicheros fichero;
-        if (!fichero.existeCarpeta(nombreCarpeta + nombreNota.toStdString()))
-        {
-            // si no existe la creamos
-            fichero.verificacionInicial(nombreCarpeta + nombreNota.toStdString());
-            std::cout << "creando carpeta nota" << std::endl;
-            // y creamos una nota
-            fichero.escribirFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak" , "");
-        } else {
-            std::cout << "Se encontro una nota" << std::endl;
-        }
-        // luego copiamos la imagen
-        fichero.copiarFichero(rutaImagen.toStdString(), nombreCarpeta + nombreNota.toStdString() + "/" + rutaImagen.split("/").last().toStdString());
-
-
-
-        // // Insertar la imagen usando un formato de imagen HTML
-        // QString htmlImage = QString("<img src='%1'/>").arg((nombreCarpeta + nombreNota.toStdString() + "/" + rutaImagen.split("/").last().toStdString()).c_str());
-        // contenidoNota->textCursor().insertHtml(htmlImage);
-
-        // Insertar la imagen usando un formato de imagen HTML
-        // Obtener la ruta completa de la imagen
-        QString imagePath = (nombreCarpeta + nombreNota.toStdString() + "/" + rutaImagen.split("/").last().toStdString()).c_str();
-
-        // Especificar la anchura deseada (ajustar según tus necesidades)
-        int anchuraDeseada = 300; // por ejemplo, ajusta este valor según tus necesidades
-
-        // Crear la etiqueta de imagen con la ruta y la anchura
-        QString htmlImage = QString("<img src='%1' width='%2'/>").arg(imagePath).arg(anchuraDeseada);
-        std::cout << htmlImage.toStdString() << std::endl;
-        // Insertar la imagen usando el formato de imagen HTML
-        contenidoNota->textCursor().insertHtml(htmlImage);
-        // Insertar la imagen usando el formato de imagen HTML
-        //contenidoNota->textCursor().insertHtml(htmlImage);
-
-        // Opcionalmente, podrías querer añadir un salto de línea después de la imagen
-        contenidoNota->textCursor().insertHtml("<br>");
-
+        // volvemos a colocar el cursor en la nota
+        contenidoNota->setTextCursor(cursor);
         // restauramos el estilo de texto
         contenidoNota->setCurrentCharFormat(formatoActual);
+        // regresamos el foco
+        contenidoNota->setFocus();
+        // redimencionamos las imagenes
+        redimensionarImagenes();
+        // restauramos el estilo de texto
+        contenidoNota->setCurrentCharFormat(formatoActual);
+        // mostramos la accion
+        mostrarEtiquetaAccion("Imagen insertada");
+
     }
-    // volvemos a colocar el cursor en la nota
-    contenidoNota->setTextCursor(cursor);
-    // restauramos el estilo de texto
-    contenidoNota->setCurrentCharFormat(formatoActual);
-    // regresamos el foco
-    contenidoNota->setFocus();
-    // redimencionamos las imagenes
-    redimensionarImagenes();
-    // restauramos el estilo de texto
-    contenidoNota->setCurrentCharFormat(formatoActual);
-    // mostramos la accion
-    mostrarEtiquetaAccion("Imagen insertada");
+    catch (const std::exception &e)
+    {
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
+    }
+
 }
 
 
@@ -1117,30 +1179,27 @@ void Ventana::redimensionarImagenes()
     QString contenido = contenidoNota->toHtml();
 
     // mostramos la posicion del cursor
-    std::cout << cursor.position() << std::endl;
+    //std::cout << cursor.position() << std::endl;
 
     // guardamos la posicion del cursor
     int posicionCursor = cursor.position();
     // mostramos el contenido de posicionCursor
-    std::cout << posicionCursor << std::endl;
+    //std::cout << posicionCursor << std::endl;
 
     // Modificamos el ancho y alto de las imágenes
     contenido = redimensionarAnchoAltoImagenes(contenido);
 
     // Actualizamos el contenido del QTextEdit
     contenidoNota->setHtml(contenido);
+    // llamamos al sonido
+    //sonidoBoton->play();
 
 
     // colocamos el cursor en la posicion extraida
     cursor.setPosition(posicionCursor);
     contenidoNota->setTextCursor(cursor);
 
-    // volvemos a colocar el cursor en la nota
-    //contenidoNota->setTextCursor(cursor);
 
-    // // Mostramos el mensaje de acción
-    // if (mensaje)
-    //     mostrarEtiquetaAccion("Imágenes redimensionadas");
 }
 
 
