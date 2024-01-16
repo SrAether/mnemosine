@@ -69,6 +69,9 @@ Ventana::Ventana(QWidget *parent)
 
     puedoRedimensionarImagenes = true;
 
+    // mostrar notas ocultas
+    mostrarNotasOcultas = true;
+
     // ruta de carpeta
     nombreCarpeta = "/notas/";
 
@@ -77,6 +80,9 @@ Ventana::Ventana(QWidget *parent)
 
     // etiqueta de nombre
     std::string nombre = "Mnemosine";
+
+    // etiqueta de configuracion
+    configuracion = "configuracion";
 
     // etiqueta de accion
     std::string accion = "Se acaba de abrir una nota";
@@ -236,6 +242,61 @@ Ventana::Ventana(QWidget *parent)
                                                     ""));
 
 
+    // luego creamos el frame que contendra las opciones de configuracion
+    frameConfiguracion = new QFrame{frame};
+    frameConfiguracion->setStyleSheet(QString::fromUtf8("QWidget {\n"
+                                                        "    /* Establecer un fondo oscuro con un gradiente que vaya de azul a p\303\272rpura */\n"
+                                                        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,\n"
+                                                        "                                stop:0 rgb(16, 16, 32), stop:1 rgb(64, 0, 128));\n"
+                                                        "    /* A\303\261adir un borde con un color ne\303\263n para darle ese aspecto vibrante cyberpunk */\n"
+                                                        "    border: 1px solid rgb(0, 255, 255);\n"
+                                                        "    border-radius: 5px; /* Esquinas redondeadas para un aspecto moderno */\n"
+                                                        "    padding: 5px; /* Espaciado interior para que el texto no toque los bordes */\n"
+                                                        "    /* Aplicar una sombra para dar profundidad */\n"
+                                                        "    box-shadow: 0 0 8px rgb(0, 255, 255);\n"
+                                                        "}\n"
+                                                        "QFrame {\n"
+                                                        "    /* Fondo y borde */\n"
+                                                        "    background-color: rgb(0, 0, 0); /* Un fondo oscuro para facilitar la lectura */\n"
+                                                        "    border: 2px solid rgb(0, 255, 255); /* Borde de color ne\303\263n */\n"
+                                                        "    border-radius: 10px; /* Esquinas redondeadas */\n"
+                                                        "\n"
+                                                        "    /* Espaciado */\n"
+                                                        "    padding: 2px; /* Espaciado interno para que el texto no toque el borde */\n"
+                                                        "}\n"
+                                                        "\n"
+                                                        "QTextEdit {\n"
+                                                        "    /* Color de texto y fondo */\n"
+                                                        "    color: rgb(180, 180, 180); /* Color claro para el texto, pero no puro blanco */\n"
+                                                        "    background-color: rgba(0, 0, 0, 0.3); /* Fondo ligeramente transparente para un efecto cyberpunk */\n"
+                                                        "\n"
+                                                        "    /* Fuente y tama\303\261o */\n"
+                                                        "    font-family: 'Orbitron', 'Courier New', monospace; /* Fuente de ancho fijo para alinear el texto */\n"
+                                                        "    font-size: 12pt; /* Tama\303\261o de fuente adecuado para la lectura */\n"
+                                                        "\n"
+                                                        "    /* Sombra para el texto */\n"
+                                                        "    text-shadow: 1px 1px rgb(0, 128, 128); /* Sombra suave para hacer resaltar el texto */\n"
+                                                        "}\n"
+                                                        "/* Estilizar botones con un efecto de ne\303\263n al pasar el rat\303\263n por encima */\n"
+                                                        "QPushButton {\n"
+                                                        "    color: rgb(224, 224, 224);\n"
+                                                        "    text-shadow: 0 0 4px rgb(0, 255, 255);\n"
+                                                        "    border: 1px solid rgb(64, 64, 128);\n"
+                                                        "    transition: transform 0.1s ease; /* Agrega una transición suave para el efecto de transformación */\n"
+                                                        "}\n"
+                                                        "\n"
+                                                        "QPushButton:hover {\n"
+                                                        "    border-color: rgb(0, 255, 255);\n"
+                                                        "    background-color: rgb(64, 0, 128);\n"
+                                                        "    color: rgb(255, 255, 255);\n"
+                                                        "    text-shadow: 0 0 6px rgb(0, 255, 255);\n"
+                                                        "    transform: scale(1.1); /* Aumenta ligeramente el tamaño del botón */\n"
+                                                        "}\n"
+                                                        "\n"
+                                                        ""));
+    frameConfiguracion->hide();
+
+
     // luego cargamos las imagenes de los botones
     iconoOcultar = new QPixmap{"./iconos/botonOcultar.png"};
     iconoMostrar = new QPixmap{"./iconos/botonAmpliar.png"};
@@ -246,6 +307,11 @@ Ventana::Ventana(QWidget *parent)
     iconoCambiarFuente = new QPixmap{"./iconos/botonCambiarFuente.png"};
     iconoCambiarColor = new QPixmap{"./iconos/botonCambiarColor.png"};
     iconoCambiarColorFondo = new QPixmap{"./iconos/botonCambiarColorFondo.png"};
+    iconoConfiguracion = new QPixmap{"./iconos/botonConfiguracion.jpeg"};
+    // --ICONOS CONFIGURACION--
+    iconoSeleccionarRutaBoveda = new QPixmap{"./iconos/botonCarpeta.jpeg"};
+    iconoSeleccionarNombreBoveda = new QPixmap{"./iconos/botonBoveda.jpeg"};
+    iconoMostrarNotasOcultas = new QPixmap{"./iconos/botonMostrarNotasOcultas.jpeg"};
 
 
 
@@ -373,6 +439,66 @@ Ventana::Ventana(QWidget *parent)
     botonCambiarColorFondo->hide();
 
 
+    // boton para configuracion
+    botonConfiguracion = new QPushButton{frameContenido};
+    botonConfiguracion->setGeometry(0, 400, tamBoton, tamBoton);
+    botonConfiguracion->setFont(*fuente);
+    botonConfiguracion->setIcon(QIcon{*iconoConfiguracion});
+    botonConfiguracion->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
+    botonConfiguracion->setMaximumSize(tamBoton, tamBoton);
+    botonConfiguracion->setToolTip("Configuracion \n Ctrl + C");
+    botonConfiguracion->hide();
+
+
+    // --BOTONES CONFIGURACION--
+
+    // boton para seleccionar ruta boveda
+    botonSeleccionarRutaBoveda = new QPushButton{frameConfiguracion};
+    botonSeleccionarRutaBoveda->setGeometry(0, 0, tamBoton, tamBoton);
+    botonSeleccionarRutaBoveda->setFont(*fuente);
+    botonSeleccionarRutaBoveda->setIcon(QIcon{*iconoSeleccionarRutaBoveda});
+    botonSeleccionarRutaBoveda->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
+    //botonSeleccionarRutaBoveda->setMaximumSize(tamBoton, tamBoton);
+    botonSeleccionarRutaBoveda->setMaximumHeight(tamBoton);
+    botonSeleccionarRutaBoveda->setToolTip("Seleccionar ruta de la boveda");
+    botonSeleccionarRutaBoveda->hide();
+
+    // boton para seleccionar nombre boveda
+    botonSeleccionarNombreBoveda = new QPushButton{frameConfiguracion};
+    botonSeleccionarNombreBoveda->setGeometry(0, 50, tamBoton, tamBoton);
+    botonSeleccionarNombreBoveda->setFont(*fuente);
+    botonSeleccionarNombreBoveda->setIcon(QIcon{*iconoSeleccionarNombreBoveda});
+    botonSeleccionarNombreBoveda->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
+    botonSeleccionarNombreBoveda->setMaximumHeight(tamBoton);
+    botonSeleccionarNombreBoveda->setToolTip("Seleccionar nombre de la boveda");
+    botonSeleccionarNombreBoveda->hide();
+
+    // boton para ocultar la configuración
+    botonOcultarConfiguracion = new QPushButton{frameConfiguracion};
+    botonOcultarConfiguracion->setGeometry(0, 50, tamBoton, tamBoton);
+    botonOcultarConfiguracion->setFont(*fuente);
+    botonOcultarConfiguracion->setIcon(QIcon{*iconoOcultar});
+    botonOcultarConfiguracion->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
+    botonOcultarConfiguracion->setMaximumSize(tamBoton, tamBoton);
+    botonOcultarConfiguracion->hide();
+
+
+    // boton para mostrar las notas ocultas
+    botonMostrarNotasOcultas = new QPushButton{frameConfiguracion};
+    botonMostrarNotasOcultas->setGeometry(0, 100, tamBoton, tamBoton);
+    botonMostrarNotasOcultas->setFont(*fuente);
+    botonMostrarNotasOcultas->setIcon(QIcon{*iconoMostrarNotasOcultas});
+    botonMostrarNotasOcultas->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
+    botonMostrarNotasOcultas->setMaximumHeight(tamBoton);
+    botonMostrarNotasOcultas->setToolTip("Mostrar notas ocultas");
+    //botonMostrarNotasOcultas->hide();
+
+
+
+    // --ETIQUETAS--
+
+    // --ETIQUETAS CONTENIDO--
+
     // luego creamos la etiqueta del nombre de la nota
     etiquetaNombre = new QLabel{QString::fromStdString(nombre), frameContenido};
     etiquetaNombre->setFont(*fuente);
@@ -400,6 +526,25 @@ Ventana::Ventana(QWidget *parent)
                                                     "    padding: 5px; /* Espaciado interior para que el texto no toque los bordes */\n"
                                                     "    border-radius: 5px; /* Esquinas redondeadas para un aspecto moderno */\n"
                                                     "}"));
+
+
+
+
+    // --ETIQUETAS CONFIGURACION--
+
+    // luego creamos la etiqueta de la ruta de la boveda
+    etiquetaConfiguracion = new QLabel{QString::fromStdString(configuracion), frameConfiguracion};
+    etiquetaConfiguracion->setFont(*fuente);
+    // le damos un alto maximo para que no se expanda
+    etiquetaConfiguracion->setMaximumHeight(tamBoton);
+    etiquetaConfiguracion->hide();
+    // luego creamos la etiqueta con el nombre de la boveda
+    etiquetaAccionConfiguracion = new QLabel{QString::fromStdString(accionConfiguracion), frameConfiguracion};
+    etiquetaAccionConfiguracion->setFont(*fuente);
+    // le damos un alto maximo para que no se expanda
+    etiquetaAccionConfiguracion->setMaximumHeight(tamBoton);
+    etiquetaAccionConfiguracion->hide();
+
 
 
     // creamos el layout de los botones del frameMenu
@@ -443,6 +588,7 @@ Ventana::Ventana(QWidget *parent)
     contentLayout2->addWidget(botonCambiarFuente);
     contentLayout2->addWidget(botonCambiarColor);
     contentLayout2->addWidget(botonCambiarColorFondo);
+    contentLayout2->addWidget(botonConfiguracion);
     contentLayout2->addWidget(etiquetaNombre);
     contentLayout2->addWidget(etiquetaAccion);
     contentLayout2->addStretch(1);
@@ -450,10 +596,40 @@ Ventana::Ventana(QWidget *parent)
     contentLayout->addLayout(contentLayout2);
     contentLayout->addWidget(contenidoNota);
 
+
+    // // Layout para frameConfiguracion
+    // QVBoxLayout *configuracionLayout = new QVBoxLayout(frameConfiguracion);
+    // QHBoxLayout *configuracionLayout2 = new QHBoxLayout;
+    // configuracionLayout2->addWidget(botonOcultarConfiguracion);
+    // configuracionLayout2->addStretch(1);
+    // configuracionLayout2->addWidget(etiquetaConfiguracion);
+    // configuracionLayout2->addWidget(etiquetaAccionConfiguracion);
+    // configuracionLayout2->addStretch(1);
+    // configuracionLayout->addLayout(configuracionLayout2);
+    // configuracionLayout->addWidget(botonSeleccionarRutaBoveda);
+    // configuracionLayout->addWidget(botonSeleccionarNombreBoveda);
+    // //configuracionLayout->addWidget(botonOcultarConfiguracion);
+    // configuracionLayout->addStretch(1);
+
+    // Layout para frameConfiguracion
+    QVBoxLayout *configuracionLayout = new QVBoxLayout(frameConfiguracion);
+    QHBoxLayout *configuracionLayout2 = new QHBoxLayout;
+    configuracionLayout2->addWidget(botonOcultarConfiguracion);  // Botón a la izquierda
+    configuracionLayout2->addWidget(etiquetaConfiguracion);      // Etiqueta en el centro
+    configuracionLayout2->addStretch(1);                         // Espacio elástico entre la etiqueta y el siguiente widget
+    configuracionLayout2->addWidget(etiquetaAccionConfiguracion); // Widget siguiente (etiquetaAccionConfiguracion)
+    configuracionLayout2->addStretch(1);
+    configuracionLayout->addLayout(configuracionLayout2);
+    configuracionLayout->addWidget(botonSeleccionarRutaBoveda);
+    configuracionLayout->addWidget(botonSeleccionarNombreBoveda);
+    configuracionLayout->addWidget(botonMostrarNotasOcultas);
+    configuracionLayout->addStretch(1);
+
     // Layout principal de la ventana
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->addWidget(frameMenu);
     mainLayout->addWidget(frameContenido); // El contenido se expande
+    mainLayout->addWidget(frameConfiguracion); // El contenido se expande
 
 
 
@@ -477,6 +653,11 @@ Ventana::Ventana(QWidget *parent)
     connect(botonCambiarFuente, SIGNAL(clicked()), this, SLOT(cambiarFuente()));
     connect(botonCambiarColor, SIGNAL(clicked()), this, SLOT(cambiarColor()));
     connect(botonCambiarColorFondo, SIGNAL(clicked()), this, SLOT(cambiarColorFondo()));
+    connect(botonConfiguracion, SIGNAL(clicked()), this, SLOT(actualizarConfiguracion()));
+    connect(botonOcultarConfiguracion, SIGNAL(clicked()), this, SLOT(ocultarConfiguracion()));
+    connect(botonSeleccionarRutaBoveda, SIGNAL(clicked()), this, SLOT(seleccionarRutaBoveda()));
+    connect(botonSeleccionarNombreBoveda, SIGNAL(clicked()), this, SLOT(seleccionarNombreBoveda()));
+    connect(botonMostrarNotasOcultas, SIGNAL(clicked()), this, SLOT(mostrarNotasOcultass()));
 
 
     // actualizamos la lista de notas
@@ -501,7 +682,9 @@ void Ventana::ocultarMenu()
     botonCambiarFuente->show();
     botonCambiarColor->show();
     botonCambiarColorFondo->show();
+    botonConfiguracion->show();
     etiquetaNombre->show();
+
 
     // cambiamos el nombre de la nota
     if (listaNotas->currentItem() != nullptr)
@@ -532,6 +715,8 @@ void Ventana::mostrarMenu()
     botonCambiarFuente->hide();
     botonCambiarColor->hide();
     botonCambiarColorFondo->hide();
+    botonConfiguracion->hide();
+
     // redimensionamos las imagenes
     redimensionarImagenes();
 
@@ -539,6 +724,37 @@ void Ventana::mostrarMenu()
     // regresamos el foco a la nota
     contenidoNota->setFocus();
 
+}
+
+void Ventana::ocultarConfiguracion()
+{
+    // ocultamos el frame de configuracion
+    frameConfiguracion->hide();
+    // mostramos el frame de contenido
+    frameContenido->show();
+    // mostramos el frame menu
+    //frameMenu->show();
+    mostrarMenu();
+    // regresamos el foco a la nota
+    contenidoNota->setFocus();
+}
+
+void Ventana::mostrarConfiguracion()
+{
+    // mostramos el frame de configuracion
+    frameConfiguracion->show();
+    // ocultamos el frame menu
+    frameMenu->hide();
+    // ocultamos el frame de contenido
+    frameContenido->hide();
+    // regresamos el foco a la nota
+    //contenidoNota->setFocus();
+    // mostrmaos los botonoes de configuracion
+    botonSeleccionarRutaBoveda->show();
+    botonSeleccionarNombreBoveda->show();
+    etiquetaConfiguracion->show();
+    etiquetaAccionConfiguracion->show();
+    botonOcultarConfiguracion->show();
 }
 
 void Ventana::nuevaNota()
@@ -610,7 +826,9 @@ void Ventana::actualizarListaNotas()
         listaNotas->clear();
         // luego la actualizamos
         ManejoFicheros fichero;
-        std::vector<std::string> notas = fichero.extraerFicheros(nombreCarpeta);
+        // mostramos el nombre de la carpeta de ntoas
+        //std::cout << "NOMBRE DE CARPETA DE NOTASAAASSASA" << nombreCarpeta << std::endl;
+        std::vector<std::string> notas = fichero.extraerFicheros(nombreCarpeta, mostrarNotasOcultas);
         // for (const std::string &nota : notas)
         // {
         //     listaNotas->addItem(QString::fromStdString(nota));
@@ -728,7 +946,7 @@ void Ventana::seleccionarNota()
     try {
         // primero obtenemos el nombre de la nota seleccionada
         QString nombreNota = listaNotas->currentItem()->text();
-
+        ManejoFicheros fichero;
         // vamos a verificar si hubo cambios en la nota actual para guardarlos, si los hubo
         // primero verificamos que la nota actual no este vacia
         if (contenidoNota->toHtml() != "")
@@ -737,7 +955,7 @@ void Ventana::seleccionarNota()
             if (nombreNotaActual != "")
             {
                 // verificamos si se modifico la nota actual
-                ManejoFicheros fichero;
+
                 if (!fichero.compararStringConFichero(contenidoNota->toHtml().toStdString(), (nombreCarpeta + nombreNotaActual.toStdString() + "/" + nombreNotaActual.toStdString() + ".tak")))
                 {
                     // mostramos en consola que deberiamos guardar la nota
@@ -748,13 +966,22 @@ void Ventana::seleccionarNota()
             }
         }
 
+        // verificamos si existe el fichero de la nota
+        if (!fichero.existeFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak"))
+        {
+            // mostramos que la nota no existe
+            mostrarEtiquetaAccion("La nota no existe, posiblemente creaste esta carpeta manualmente");
+            nombreNota = nombreNotaActual;
+            return;
+        }
+
 
         // Actualizamos el nombre de la nota actual
         nombreNotaActual = nombreNota;
         // mostramos el nombre en consola
         std::cout << nombreNota.toStdString() << std::endl;
         // luego obtenemos el contenido de la nota
-        ManejoFicheros fichero;
+        //ManejoFicheros fichero;
         //std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() /*+ ".txt"*/);
         std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak");
         // luego mostramos el contenido de la nota
@@ -771,10 +998,13 @@ void Ventana::seleccionarNota()
     }
 }
 
-void Ventana::verificacionInicial()
+void Ventana::verificacionInicial(bool iteracion)
 {
     // verificamos si existe la carpeta notas
     ManejoFicheros fichero;
+
+    // mostramos el estado de primeraVez
+    std::cout << "iteracion: " << iteracion << std::endl;
     // vamos a verificar ficheros por lo que es necesario usar un try catch
     try {
 
@@ -834,6 +1064,28 @@ void Ventana::verificacionInicial()
                 fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
             }
         }
+        else {
+            std::cout << "Se encontro una carpeta de configuracion --- soy la linea 1066 " << std::endl;
+        }
+
+
+
+
+        // verificamos si existe el archivo de configuracion
+        if (!fichero.existeFichero(*nombreCarpetaConfiguracion + "configuracion.tak"))
+        {
+            // si no existe lo creamos
+            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", "./notas/");
+            //std::string config = "rutaCarpetaBoveda: \"./\"\n";
+            //config += "nombreCarpetaBoveda: \"notas/\"\n";
+            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+            // llamamos al metodo para actualizar la ruta de la carpeta de la boveda
+            seleccionarRutaBoveda();
+            // llamamos al metodo para actualizar el nombre de la carpeta de la boveda
+            seleccionarNombreBoveda();
+            // llamamos el metodo para ocultar la configuracion
+            ocultarConfiguracion();
+        }
 
         // luego leemos el archivo de configuracion
         std::string configuracion = fichero.leerFichero(*nombreCarpetaConfiguracion + "configuracion.tak");
@@ -854,6 +1106,7 @@ void Ventana::verificacionInicial()
 
         // unimos la ruta de la carpeta de notas con el nombre de la carpeta de notas
         nombreCarpeta = rutaCarpetaNotas + nombreCarpeta;
+        std::cout << "Ruta de la carpeta de notas: " << rutaCarpetaNotas << std::endl;
         std::cout << "nombreCarpeta: " << nombreCarpeta << std::endl;
 
         if (!fichero.existeCarpeta(nombreCarpeta))
@@ -861,7 +1114,8 @@ void Ventana::verificacionInicial()
             // si no existe la creamos
             fichero.verificacionInicial(nombreCarpeta);
             //std::cout << "creando carpeta contenedor" << std::endl;
-            QMessageBox::information(this, "Bienvenido", "Bienvenido a Mnemosine\n\nPara comenzar cree una nueva nota");
+            if (!iteracion) // si es una iteracion interna
+                QMessageBox::information(this, "Bienvenido", "Bienvenido a Mnemosine\n\nPara comenzar cree una nueva nota");
             // y creamos una nota que explica los comandos basicos
             // primero creamos la carpeta de la nota
             //fichero.verificacionInicial(nombreCarpeta + "comandosBasicos");
@@ -1199,6 +1453,20 @@ void Ventana::mostrarEtiquetaAccion(const QString &accion)
     QTimer::singleShot(3000, this, SLOT(ocultarEtiquetaAccion()));
 }
 
+void Ventana::ocultarEtiquetaAccionConfiguracion()
+{
+    etiquetaAccionConfiguracion->hide();
+    //redimensionarImagenes();
+
+}
+
+void Ventana::mostrarEtiquetaAccionConfiguracion(const QString &accion)
+{
+    etiquetaAccionConfiguracion->setText(accion);
+    etiquetaAccionConfiguracion->show();
+    QTimer::singleShot(3000, this, SLOT(ocultarEtiquetaAccionConfiguracion()));
+}
+
 Ventana::~Ventana()
 {
     // guardamos la nota que tenemos abierta en caso de tener una nota seleccionada
@@ -1322,7 +1590,283 @@ QString Ventana::redimensionarAnchoAltoImagenes(const QString &html)
 
 
 
+void Ventana::actualizarConfiguracion()
+{
+    // guardamos la nota que tenemos abierta en caso de tener una nota seleccionada
+    if (listaNotas->currentItem() != nullptr)
+    {
+        guardarNota();
+    }
+    // deseleccionamos la nota actual
+    listaNotas->setCurrentItem(nullptr);
+    // borramos el contenido del editor de texto
+    contenidoNota->clear();
+    // borramos el string notaActual
+    nombreNotaActual = "";
+
+
+
+    // primero verificamos si existe la carpeta de configuracion
+    ManejoFicheros fichero;
+    if (!fichero.existeCarpeta(*nombreCarpetaConfiguracion))
+    {
+        // si no existe la creamos
+        fichero.verificacionInicial(*nombreCarpetaConfiguracion);
+        std::cout << "creando carpeta configuracion" << std::endl;
+
+        // -- BLOQUE DE OBTENCION DE RUTA DE LA CARPETA DE NOTAS -----------------------------------------------------------------------------------------------------------------
+        // generamos un dialogo para pedir la ubicacion de la carpeta de notas
+        QString nombreCarpeta = QFileDialog::getExistingDirectory(this, tr("Por favor seleccione en que ruta le gustaria tener su boveda"), "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        std::string config;
+        // verificamos si se ingreso un nombre
+        if (!nombreCarpeta.isEmpty())
+        {
+            // creamos el archivo de configuracion
+            config = "rutaCarpetaBoveda: \"" + nombreCarpeta.toStdString();
+            config += "\"\n";
+            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+        } else {
+            // creamos el archivo de configuracion
+            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", "./notas/");
+            config = "rutaCarpetaBoveda: \"./\"\n";
+        }
+        fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+
+    } // en caso de existir
+    else
+    {
+        // actualizamos la lista de notas
+        actualizarListaNotas();
+
+        // luego leemos el archivo de configuracion
+        std::string configuracion = fichero.leerFichero(*nombreCarpetaConfiguracion + "configuracion.tak");
+        // procesamos el archivo generando un string con el contenido de la ruta de la boveda y otro con el nombre de la boveda
+        // -- BLOQUE DE OBTENCION DE LA RUTA DE LA CARPETA DE NOTAS --
+        // luego obtenemos el nombre de la carpeta de notas
+        rutaCarpetaNotas = fichero.extraerString(configuracion, "rutaCarpetaBoveda: \"");
+        // tomamos el contenido de configuración hasta el salto de linea
+        rutaCarpetaNotas = rutaCarpetaNotas.substr(0, rutaCarpetaNotas.find("\""));
+        //std::cout << "rutaCarpetaNotas: " << rutaCarpetaNotas << std::endl;
+
+        // -- BLOQUE DE OBTENCION DEL NOMBRE DE LA CARPETA DE NOTAS --
+        // Obtenemos el nombre de la carpeta de notas
+        nombreCarpetaNotas = fichero.extraerString(configuracion, rutaCarpetaNotas + "\"\nnombreCarpetaBoveda: \"");
+        nombreCarpetaNotas = nombreCarpetaNotas.substr(0, nombreCarpetaNotas.find("\""));
+        //std::cout << "nombreCarpeta: " << nombreCarpetaNotas << std::endl;
+
+        // asignamos texto al label configuracion
+        //configuracion = "Configuración";
+
+        // colocamos las rutas en los botones
+        botonSeleccionarRutaBoveda->setText(QString::fromStdString(rutaCarpetaNotas));
+        botonSeleccionarNombreBoveda->setText(QString::fromStdString(nombreCarpetaNotas));
+
+        // colocamos el estado de las notas ocultas
+        if (!mostrarNotasOcultas)
+            botonMostrarNotasOcultas->setText("Mostrar notas ocultas");
+        else
+            botonMostrarNotasOcultas->setText("Ocultar notas ocultas");
+
+        // mostramos el frame de configuracion
+        mostrarConfiguracion();
+
+        // mostramos una etiqueta de accion indicando que acabamos de ingresar a la configuracion
+        mostrarEtiquetaAccionConfiguracion("Acabas de ingresar a la configuración");
+
+
+
+    }
+}
+
+
+
+// --SLOTS DE LA CONFIGURACION--
+void Ventana::seleccionarRutaBoveda()
+{
+    // generamos un objeto de tipo ManejoFicheros
+    ManejoFicheros fichero;
+    // creamos un booleano que simbolice la existencia de la carpeta por lo que es necesario respaldar el nombre de la boveda
+    bool existeCarpeta = true;
+    // vamos a verificar y modificar archivos por lo que es necesario usar un try catch
+    try {
+        // verificamos que exista la carpeta de configuracion
+        if (!fichero.existeCarpeta(*nombreCarpetaConfiguracion))
+        {
+            // si no existe la creamos
+            fichero.verificacionInicial(*nombreCarpetaConfiguracion);
+            std::cout << "creando carpeta configuracion" << std::endl;
+            existeCarpeta = false; // ya que no existia la carpeta de configuracion no existe la carpeta de la boveda
+
+        }
+        // -- BLOQUE DE OBTENCION DE RUTA DE LA CARPETA DE NOTAS -----------------------------------------------------------------------------------------------------------------
+        // generamos un dialogo para pedir la ubicacion de la carpeta de notas
+        QString nombreCarpeta = QFileDialog::getExistingDirectory(this, tr("Por favor seleccione en que ruta le gustaria tener su boveda"), "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        std::string config;
+        // verificamos si se ingreso un nombre
+        if (!nombreCarpeta.isEmpty())
+        {
+            // creamos el archivo de configuracion
+            config = "rutaCarpetaBoveda: \"" + nombreCarpeta.toStdString();
+            config += "\"\n";
+            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+        } else {
+            // creamos el archivo de configuracion
+            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", "./notas/");
+            config = "rutaCarpetaBoveda: \"./\"\n";
+            return;
+        }
+
+        // en caso de que exista la carpeta de configuracion extraemos el nombre de la boveda
+        // verificamos la existencia del archivo de configuracion
+        if(!fichero.existeFichero(*nombreCarpetaConfiguracion + "configuracion.tak" ))
+            existeCarpeta = false; // decir que no existe la carpeta de configuracion es lo mismo que decir que no existe el archivo de configuracion que implica que no existe la carpeta de la boveda
+
+        if (existeCarpeta)
+        {
+            // extraemos el contenido del archivo de configuracion
+            std::string configuracion = fichero.leerFichero(*nombreCarpetaConfiguracion + "configuracion.tak");
+            // obtenemos el nombre de la boveda
+            std::string nombreBoveda = fichero.extraerString(configuracion, "rutaCarpetaBoveda: \"");
+            // tomamos el contenido de configuración hasta el salto de linea
+            nombreBoveda = nombreBoveda.substr(0, nombreBoveda.find("/"));
+            // extraemos el nombre de la carpeta de notas
+            nombreBoveda = fichero.extraerString(configuracion, rutaCarpetaNotas + "\"\nnombreCarpetaBoveda: \"");
+            // tomamos el contenido de configuración hasta el salto de linea
+            nombreBoveda = nombreBoveda.substr(0, nombreBoveda.find("\""));
+            // quitamos los / del nombre de la boveda
+            nombreBoveda = nombreBoveda.substr(1, nombreBoveda.size() - 2);
+            // mostramos la opcion de copiar las notas a la nueva carpeta
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(this, "Copia de notas", "¿Deseas copiar las notas a la nueva carpeta?", QMessageBox::Yes|QMessageBox::No);
+            if (reply == QMessageBox::Yes) {
+                // copiamos las notas a la nueva carpeta
+                fichero.copiarFicheroNotas(rutaCarpetaNotas + "/" + nombreBoveda , nombreCarpeta.toStdString() + "/" + nombreBoveda);
+            } else {
+                // no copiamos las notas a la nueva carpeta
+            }
+
+
+
+            //std::cout << "nombreBoveda: " << nombreBoveda << std::endl;
+            // luego creamos el archivo de configuracion
+            config += "nombreCarpetaBoveda: \"/" + nombreBoveda + "/\"\n";
+        } else {
+            // le asignamos un nombre por defecto a la boveda
+            config += "nombreCarpetaBoveda: \"/notas/\"\n";
+
+        }
+
+
+
+        // luego creamos el archivo de configuracion
+        fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+        // actualizamos la configuracion
+        verificacionInicial(true); // indicamos que es una iteracion interna
+        // actualizamos las etiquetas y botones de la configuracion
+        actualizarConfiguracion();
+        // mostramos una etiqueta de accion indicando que acabamos de actualizar la ruta de la boveda
+        mostrarEtiquetaAccionConfiguracion("Acabas de actualizar la ruta de la boveda");
+    } catch (const std::exception &e)
+    {
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
+        // acaba de suceder un error por lo que ideal realizar una verificacion inicial
+        verificacionInicial( true); // indicamos que es una iteracion interna
+        // actualizamos las etiquetas y botones de la configuracion
+        actualizarConfiguracion();
+        // mostramos una etiqueta de accion indicando que acaba de pasar un error
+        mostrarEtiquetaAccionConfiguracion("ERROR, NO PODEMOS ASEGURAR LA INTEGRIDAD DE LOS DATOS DE LA BOVEDA, CODIGO DE ERROR: 101010");
+    }
+}
 
 
 
 
+void Ventana::seleccionarNombreBoveda()
+{
+    // generamos un objeto de tipo ManejoFicheros
+    ManejoFicheros fichero;
+    // creamos un booleano que simbolice la existencia de la carpeta por lo que es necesario respaldar el nombre de la boveda
+    //bool existeCarpeta = true;
+
+    // vamos a verificar y modificar archivos por lo que es necesario usar un try catch
+    try {
+        // verificamos que exista la carpeta de configuracion
+        if (!fichero.existeCarpeta(*nombreCarpetaConfiguracion))
+        {
+            // si no existe la creamos
+            fichero.verificacionInicial(*nombreCarpetaConfiguracion);
+            std::cout << "creando carpeta configuracion" << std::endl;
+            //existeCarpeta = false; // ya que no existia la carpeta de configuracion no existe la carpeta de la boveda
+
+        }
+        // -- BLOQUE DE OBTENCION DE NOMBRE DE LA CARPETA DE NOTAS -----------------------------------------------------------------------------------------------------------------
+        // generamos un dialogo para pedir el nombre de la carpeta de notas
+        bool ok = false;
+        QString boveda;
+        // ciclo que se sera ejecutado hasta que se ingrese un nombre valido
+        while(!ok)
+        {
+            boveda = QInputDialog::getText(this, "Configuracion", "Nombre de la carpeta de notas:", QLineEdit::Normal, "", &ok);
+            // verificamos si se ingreso un nombre
+            // vamos a crear un un fichero por lo que el nombre no debe contener caracteres especiales
+            if (boveda.contains(QRegularExpression("[\\/:*?\"<>|]") ))
+            {
+                // mostramos que no se puede crear una nota con ese nombre
+                //mostrarEtiquetaAccion("No se puede crear una nota con ese nombre");
+                // mostramos un dialogo de error
+                QMessageBox::critical(this, "Error", "No se puede crear una nota con ese nombre");
+                ok = false;
+            }
+        }
+
+        if (ok && !boveda.isEmpty())
+        {
+            // creamos el archivo de configuracion
+            std::string config = "rutaCarpetaBoveda: \"" + rutaCarpetaNotas;
+            config += "\"\n";
+            config += "nombreCarpetaBoveda: \"/" + boveda.toStdString() + "/\"\n";
+            fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+        } else {
+            // creamos el archivo de configuracion
+            std::string config = "rutaCarpetaBoveda: \"" + rutaCarpetaNotas;
+            config += "\"\n";
+            config = "nombreCarpetaBoveda: \"notas/\"\n";
+            fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+
+        }
+        // actualizamos la configuracion
+        verificacionInicial(true); // indicamos que es una iteracion interna
+        // actualizamos las etiquetas y botones de la configuracion
+        actualizarConfiguracion();
+        // mostramos una etiqueta de accion indicando que acabamos de actualizar la ruta de la boveda
+        mostrarEtiquetaAccionConfiguracion("Acabas de actualizar el nombre de la boveda");
+    } catch (const std::exception &e)
+    {
+        // mostramos el error en una ventana
+        QMessageBox::critical(this, "Error", e.what());
+        // acaba de suceder un error por lo que ideal realizar una verificacion inicial
+        verificacionInicial(true); // indicamos que es una iteracion interna
+        // actualizamos las etiquetas y botones de la configuracion
+        actualizarConfiguracion();
+        // mostramos una etiqueta de accion indicando que acaba de pasar un error
+        mostrarEtiquetaAccionConfiguracion("ERROR, NO PODEMOS ASEGURAR LA INTEGRIDAD DE LOS DATOS DE LA BOVEDA, CODIGO DE ERROR: 101011");
+    }
+
+}
+
+
+void Ventana::mostrarNotasOcultass()
+{
+    mostrarNotasOcultas = !mostrarNotasOcultas;
+    // mostramos una etiqueta de accion indicando que acabamos de actualizar el estado de las notas ocultas
+    if (!mostrarNotasOcultas)
+        mostrarEtiquetaAccionConfiguracion("Acabas de ocultar las notas ocultas");
+    else
+        mostrarEtiquetaAccionConfiguracion("Acabas de mostrar las notas ocultas");
+    // actualizamos la configuracion
+    verificacionInicial(true); // indicamos que es una iteracion interna
+    // actualizamos las etiquetas y botones de la configuracion
+    actualizarConfiguracion();
+
+}

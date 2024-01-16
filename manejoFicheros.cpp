@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <filesystem>
 #include <algorithm>
+// para debug
+#include <iostream>
 
 ManejoFicheros::ManejoFicheros()
 {
@@ -90,7 +92,7 @@ bool compararFechas(const std::string &archivo1, const std::string &archivo2, co
     return atributos1.st_mtime < atributos2.st_mtime;
 }
 
-std::vector<std::string> ManejoFicheros::extraerFicheros(std::string nombreCarpeta) {
+std::vector<std::string> ManejoFicheros::extraerFicheros(std::string nombreCarpeta, bool ocultos) {
     std::vector<std::string> archivos;
 
     // Leemos la carpeta ficheros y guardamos los nombres de todos los archivos
@@ -116,6 +118,13 @@ std::vector<std::string> ManejoFicheros::extraerFicheros(std::string nombreCarpe
     std::sort(archivos.begin(), archivos.end(), [nombreCarpeta](const std::string &a, const std::string &b) {
         return compararFechas(a, b, nombreCarpeta);
     });
+
+    // Eliminar los archivos ocultos
+    if (!ocultos) {
+        archivos.erase(std::remove_if(archivos.begin(), archivos.end(), [](const std::string &archivo) {
+            return archivo[0] == '.';
+        }), archivos.end());
+    }
 
     return archivos;
 }
@@ -187,7 +196,7 @@ bool ManejoFicheros::compararStringConFichero(const std::string& string, const s
         }
         return false;
     } catch (const std::exception& e) {
-        throw std::runtime_error("No se pudo comparar el string con el fichero");
+        throw std::runtime_error("No se pudo comparar el string con el fichero : " + fichero);
         //std::cerr << "Error al comparar el string con el fichero: " << e.what() << std::endl;
     }
 }
@@ -205,3 +214,163 @@ std::string ManejoFicheros::extraerString(std::string& cadena, const std::string
     }
     return "";
 }
+
+bool ManejoFicheros::existeFichero(const std::string& nombreFichero) {
+    try {
+        if (std::filesystem::exists(nombreFichero)) {
+            return true;
+        }
+        return false;
+    } catch (const std::exception& e) {
+        throw std::runtime_error("No se pudo verificar si existe el fichero");
+        //std::cerr << "Error al verificar si existe el fichero: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+
+void ManejoFicheros::copiarFicheroNotas(const std::string& origen, const std::string& destino)
+{
+    // primero abrimos el fichero origen
+    // verificamos que exista el fichero de origen
+    if (!this->existeFichero(origen))
+    {
+        throw std::runtime_error("No existe el fichero de origen");
+    }
+    // abrimos el fichero origen y extraemos sus ficheros de notas
+    std::vector<std::string> ficheros = this->extraerFicheros(origen);
+    // creamos un vector de string que contendra los nombres de los ficheros de notas
+    std::vector<std::string> ficherosNotas;
+    // recorremos el vector de ficheros de notas y verificamos que sean ficheros de notas
+    for (std::string fichero : ficheros)
+    {
+        // extraemos el nombre de la nota es decir lo que esta despues del ultimo /
+        std::string nombreNota = fichero.substr(fichero.find_last_of("/") + 1);
+        //std::cout << "nombreNota: " << nombreNota << std::endl;
+        // las notas tienen extension .tak por lo que añádimos .tak al nombre de la nota
+        nombreNota += ".tak";
+        // mostramos como queda fichero mas nombre nota
+        //std::cout << "fichero + nombreNota: " << fichero + "/" + nombreNota << std::endl;
+        // verificamos que exista el fichero de nota lo que implica que sea una nota
+        if (this->existeFichero(origen + "/" + fichero + "/" + nombreNota))
+        {
+            // añadimos el nombre de la nota al vector de ficheros de notas
+            ficherosNotas.push_back(origen + "/" + fichero + "/" + nombreNota);
+        }
+    }
+    // llamamos al metodo que procesa las notas
+    for (std::string fichero : ficherosNotas)
+    {
+        // extraemos el texto de la nota
+        std::string textoNota = this->leerFichero(fichero);
+        // procesamos el texto de la nota
+        //this->procesarNotas(textoNota, destino, origen);
+        // el origen es la ruta de fichero hasta el ultimo /
+        std::string origenNota = fichero.substr(0, fichero.find_last_of("/"));
+        this->procesarNotas(textoNota, destino, origenNota);
+        // creamos el fichero de la nueva nota
+        // extraemos el nombre de la nota
+        //std::string nombreNota = fichero.substr(fichero.find_last_of("/") + 1);
+        // creamos el fichero de la nota en la nueva ruta
+        //std::string nuevaNota = destino + "/" + nombreNota;
+        // creamos la carpeta de la nota
+        //this->verificacionInicial(
+    }
+}
+
+void ManejoFicheros::procesarNotas(std::string& entrada, std::string nuevaRuta, std::string viejaRuta)
+{
+
+    // nueva ruta
+    std::cout << "nuevaRuta: " << nuevaRuta << std::endl;
+    // vieja ruta
+    std::cout << "viejaRuta: " << viejaRuta << std::endl;
+    // extraemos el nombre de la nota que es lo que se encuentra despues del ultimo /
+    std::string nombreNota = viejaRuta.substr(viejaRuta.find_last_of("/") + 1);
+    std::cout << "nombreNota: " << nombreNota << std::endl;
+    // creamos la carpeta de la nota en la nueva ruta
+    std::string nuevaCarpeta = nuevaRuta + "/" + nombreNota;
+    std::cout << "nuevaCarpeta: " << nuevaCarpeta << std::endl;
+    //this->verificacionInicial(nuevaCarpeta);
+
+    // copiamos todo el contenido de la carpeta de la nota a la nueva carpeta para mover las imagenes
+    this->copiarCarpeta(viejaRuta, nuevaCarpeta);
+
+     // es momento de procesar el texto de la nota, la nota contiene texto en html
+    // ya temos el texto de la nota en la variable entrada
+    // tenemos que iterar sobre el texto de la nota y extraer las imagenes
+    // las imagenes estan entre <img src=" y "
+    // buscamos el primer <img src="
+
+    // extraemos el tamaño del texto de la nota
+    int tamanoEntrada = entrada.length();
+    // creamos un nuevo string que contendra el texto de la nota procesado
+    std::string textoProcesado = "";
+
+    // creamos un entero que guardara la posicion de la ocurrencia actual
+    int posActual = 0;
+
+
+
+    // ciclo para modificar el texto de la nota
+    while (true)
+    {
+        // demos tener en cuenta que es lo que se planea remplazar
+        // pretendemos remplarazar el contenido de la cadena viejaRuta por nuevaRuta
+        // por lo que debemos buscar la cadena viejaRuta dentro de la cadena entrada
+        // buscamos la primera ocurrencia de viejaRuta a partir de la posicion actual
+        int posImg = entrada.find(viejaRuta, posActual);
+        // verificamos que la posicion no sea -1
+        if (posImg == std::string::npos)
+        {
+            // si es -1 significa que no se encontro ninguna ocurrencia
+            // por lo que salimos del ciclo
+            break;
+        }
+        // si no es -1 significa que se encontro una ocurrencia
+        // pasamos la cadena desde posActual hasta posImg a la variable textoProcesado
+        textoProcesado += entrada.substr(posActual, posImg - posActual);
+        // agregamos la nueva ruta
+        textoProcesado += nuevaRuta + "/" + nombreNota;
+        // refrescamos la posicion actual añádiendole el tamaño de la vieja ruta
+        posActual = posImg + viejaRuta.length();
+
+    }
+
+
+    // agregamos el texto restante
+    textoProcesado += entrada.substr(posActual, tamanoEntrada - posActual);
+
+
+    // mostramos el texto de entrada
+    std::cout << "entrada: " << entrada << std::endl;
+    // mostrar el texto procesado
+    std::cout << "textoProcesado: " << textoProcesado << std::endl;
+
+    // escribimos el texto procesado en el fichero de la nota
+    this->escribirFichero(nuevaCarpeta + "/" + nombreNota + ".tak", textoProcesado);
+
+
+}
+
+
+void ManejoFicheros::copiarCarpeta(const std::string& source, const std::string& destination) {
+    std::filesystem::path sourcePath(source);
+    std::filesystem::path destinationPath(destination);
+
+    for (const auto& entry : std::filesystem::directory_iterator(sourcePath)) {
+        const auto target = destinationPath / entry.path().filename();
+        try {
+            if (std::filesystem::is_directory(entry.status())) {
+                std::filesystem::create_directory(target);
+                copiarCarpeta(entry.path().string(), target.string());
+            } else {
+                std::filesystem::copy(entry, target, std::filesystem::copy_options::overwrite_existing);
+            }
+        } catch (const std::exception& e) {
+            // Manejo de errores, puedes imprimir un mensaje o lanzar una excepción según tu necesidad.
+            std::cerr << "Error al copiar: " << e.what() << std::endl;
+        }
+    }
+}
+
