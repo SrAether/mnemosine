@@ -30,6 +30,8 @@ private:
     std::string nombreCarpeta;
     // mostrar notas ocultas
     bool mostrarNotasOcultas;
+    // mostrar fechas
+    bool mostrarFechasNotas;
 
 
 
@@ -38,6 +40,10 @@ private:
     std::string configuracion;
     // string que se usa en la funcion que muestra por unos segundos un mensaje en la interfaz grafica de configuracion, es parte de la construccion del label de accion
     std::string accionConfiguracion;
+
+    // STRINGS QUE MUESTRAN LA FECHA DE CREACION DE LA NOTA Y FECHA DE MODIFICACION
+    std::string fechaCreacion;
+    std::string fechaModificacion;
 
     // agregamos el nombre de la carpeta de configuracion
     std::string* nombreCarpetaConfiguracion;
@@ -77,6 +83,7 @@ private:
     QPushButton *botonSeleccionarNombreBoveda;
     QPushButton *botonOcultarConfiguracion;
     QPushButton *botonMostrarNotasOcultas;
+    QPushButton *botonMostrarFechas;
 
     // --ETIQUETAS --
     // --ETIQUETAS DE CONTENIDO--
@@ -84,6 +91,10 @@ private:
     QLabel *etiquetaNombre;
     // creamos una etiqueta que nombra a alguna accion realizada
     QLabel *etiquetaAccion;
+    QLabel *etiquetaFechaCreacion; // etiqueta que muestra la fecha de creacion de la nota
+    QLabel *etiquetaFechaModificacion; // etiqueta que muestra la fecha de modificacion de la nota
+
+
     // --ETIQUETAS DE CONFIGURACION--
     // etiqueta para mostrar la ruta de la carpeta de notas
     QLabel *etiquetaAccionConfiguracion;
@@ -174,6 +185,7 @@ private slots:
     void seleccionarRutaBoveda();
     void seleccionarNombreBoveda();
     void mostrarNotasOcultass();
+    void mostrarFechas();
 
     // metodo para actualizar la ruta de la carpeta de notas
     void actualizarConfiguracion();

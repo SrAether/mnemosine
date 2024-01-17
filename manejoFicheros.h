@@ -22,6 +22,10 @@ public:
     void copiarFicheroNotas(const std::string& origen, const std::string& destino);
     // --Metodo que procesa las notas para cambiar las rutas de las imagenes
     void procesarNotas(std::string& entrada, std::string nuevaRuta, std::string viejaRuta);
+    // --Metodo para extraer la fecha de creacion de un fichero
+    std::string extraerFechaCreacion(const std::string& nombreFichero);
+    // --Metodo para extraer la fecha de modificacion de un fichero
+    std::string extraerFechaModificacion(const std::string& nombreFichero);
 
 };
 #endif // MANEJOFICHEROS_H

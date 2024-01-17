@@ -7,6 +7,11 @@
 #include <sys/stat.h>
 #include <filesystem>
 #include <algorithm>
+#include <ctime>
+
+//#include <algorithm> // Para std::trim
+#include <cctype>    // Para std::isspace
+
 // para debug
 #include <iostream>
 
@@ -188,16 +193,31 @@ void ManejoFicheros::copiarFichero(const std::string& origen, const std::string&
 }
 
 
-bool ManejoFicheros::compararStringConFichero(const std::string& string, const std::string& fichero) {
+bool ManejoFicheros::compararStringConFichero(const std::string& str, const std::string& fichero) {
     try {
         std::string textoFichero = leerFichero(fichero);
-        if (textoFichero == string) {
-            return true;
+
+        // Eliminar espacios en blanco al principio y al final
+        std::string textoFicheroTrimmed;
+        for (char c : textoFichero) {
+            if (!std::isspace(c)) {
+                textoFicheroTrimmed += c;
+            }
         }
-        return false;
+
+        std::string strTrimmed;
+        for (char c : str) {
+            if (!std::isspace(c)) {
+                strTrimmed += c;
+            }
+        }
+
+        // Realizar la comparación
+        return (textoFicheroTrimmed == strTrimmed);
     } catch (const std::exception& e) {
-        throw std::runtime_error("No se pudo comparar el string con el fichero : " + fichero);
-        //std::cerr << "Error al comparar el string con el fichero: " << e.what() << std::endl;
+        // Si no se puede leer el fichero, devuelve false y lanza una excepción
+        std::cerr << "No se pudo comparar el string con el fichero: " << e.what() << std::endl;
+        return false;
     }
 }
 
@@ -258,6 +278,8 @@ void ManejoFicheros::copiarFicheroNotas(const std::string& origen, const std::st
             ficherosNotas.push_back(origen + "/" + fichero + "/" + nombreNota);
         }
     }
+    // creamos la carpeta de destino
+    this->verificacionInicial(destino);
     // llamamos al metodo que procesa las notas
     for (std::string fichero : ficherosNotas)
     {
@@ -291,7 +313,7 @@ void ManejoFicheros::procesarNotas(std::string& entrada, std::string nuevaRuta, 
     // creamos la carpeta de la nota en la nueva ruta
     std::string nuevaCarpeta = nuevaRuta + "/" + nombreNota;
     std::cout << "nuevaCarpeta: " << nuevaCarpeta << std::endl;
-    //this->verificacionInicial(nuevaCarpeta);
+    this->verificacionInicial(nuevaCarpeta);
 
     // copiamos todo el contenido de la carpeta de la nota a la nueva carpeta para mover las imagenes
     this->copiarCarpeta(viejaRuta, nuevaCarpeta);
@@ -321,7 +343,7 @@ void ManejoFicheros::procesarNotas(std::string& entrada, std::string nuevaRuta, 
         // buscamos la primera ocurrencia de viejaRuta a partir de la posicion actual
         int posImg = entrada.find(viejaRuta, posActual);
         // verificamos que la posicion no sea -1
-        if (posImg == std::string::npos)
+        if (size_t(posImg) == std::string::npos)
         {
             // si es -1 significa que no se encontro ninguna ocurrencia
             // por lo que salimos del ciclo
@@ -374,3 +396,40 @@ void ManejoFicheros::copiarCarpeta(const std::string& source, const std::string&
     }
 }
 
+
+std::string ManejoFicheros::extraerFechaCreacion(const std::string& nombreFichero)
+{
+    struct stat info;
+    if (stat(nombreFichero.c_str(), &info) != 0) {
+        return "";
+    }
+
+    // Obtener la fecha de creación en formato legible
+    std::time_t tiempoCreacion = info.st_ctime;
+    std::tm* tiempoInfo = std::localtime(&tiempoCreacion);
+
+    // Formatear la fecha en una cadena legible
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tiempoInfo);
+
+    return std::string(buffer);
+}
+
+
+std::string ManejoFicheros::extraerFechaModificacion(const std::string& nombreFichero)
+{
+    struct stat info;
+    if (stat(nombreFichero.c_str(), &info) != 0) {
+        return "";
+    }
+
+    // Obtener la fecha de modificación en formato legible
+    std::time_t tiempoModificacion = info.st_mtime;
+    std::tm* tiempoInfo = std::localtime(&tiempoModificacion);
+
+    // Formatear la fecha en una cadena legible
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tiempoInfo);
+
+    return std::string(buffer);
+}

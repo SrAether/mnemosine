@@ -70,7 +70,10 @@ Ventana::Ventana(QWidget *parent)
     puedoRedimensionarImagenes = true;
 
     // mostrar notas ocultas
-    mostrarNotasOcultas = true;
+    mostrarNotasOcultas = false;
+
+    // mostrar fechas
+    mostrarFechasNotas = true;
 
     // ruta de carpeta
     nombreCarpeta = "/notas/";
@@ -83,6 +86,11 @@ Ventana::Ventana(QWidget *parent)
 
     // etiqueta de configuracion
     configuracion = "configuracion";
+
+    // etiqueta fecha creacion
+    //fechaCreacion = "Fecha de creacion: ";
+    // etiqueta fecha modificacion
+    fechaModificacion = "Fecha de modificacion: ";
 
     // etiqueta de accion
     std::string accion = "Se acaba de abrir una nota";
@@ -490,8 +498,20 @@ Ventana::Ventana(QWidget *parent)
     botonMostrarNotasOcultas->setIcon(QIcon{*iconoMostrarNotasOcultas});
     botonMostrarNotasOcultas->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
     botonMostrarNotasOcultas->setMaximumHeight(tamBoton);
-    botonMostrarNotasOcultas->setToolTip("Mostrar notas ocultas");
+    botonMostrarNotasOcultas->setToolTip("Mostrar notas ocultas \" Ctrl + 0 (Cero) \"");
     //botonMostrarNotasOcultas->hide();
+
+
+    // boton para mostrar las fechas de creacion y modificacion
+    botonMostrarFechas = new QPushButton{frameConfiguracion};
+    botonMostrarFechas->setGeometry(0, 150, tamBoton, tamBoton);
+    botonMostrarFechas->setFont(*fuente);
+    botonMostrarFechas->setIcon(QIcon{*iconoMostrarNotasOcultas});
+    botonMostrarFechas->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
+    botonMostrarFechas->setMaximumHeight(tamBoton);
+    botonMostrarFechas->setToolTip("Mostrar fechas de creacion y modificacion de las notas");
+    botonMostrarFechas->setText("Mostrar fechas");
+
 
 
 
@@ -508,6 +528,18 @@ Ventana::Ventana(QWidget *parent)
     etiquetaAccion = new QLabel{QString::fromStdString(accion), frameContenido};
     etiquetaAccion->setFont(*fuente);
     etiquetaAccion->hide();
+
+    // // creamos la etiqueta con la fecha de creacion de la nota
+    // etiquetaFechaCreacion = new QLabel{QString::fromStdString(fechaCreacion), frameContenido};
+    // etiquetaFechaCreacion->setFont(*fuente);
+    // //etiquetaFechaCreacion->hide();
+
+    // creamos la etiqueta con la fecha de modificacion de la nota
+    etiquetaFechaModificacion = new QLabel{QString::fromStdString(fechaModificacion), frameContenido};
+    etiquetaFechaModificacion->setFont(*fuente);
+    //etiquetaFechaModificacion->hide();
+
+
 
     // le damos estilo cyberpunk con color morado azulado
     etiquetaNombre->setStyleSheet(QString::fromUtf8("QLabel {\n"
@@ -581,6 +613,8 @@ Ventana::Ventana(QWidget *parent)
     // Layout para frameContenido
     QVBoxLayout *contentLayout = new QVBoxLayout(frameContenido);
     QHBoxLayout *contentLayout2 = new QHBoxLayout;
+    //QHBoxLayout *contentLayout3 = new QHBoxLayout;
+    // CONTENT LAYOUT 2
     contentLayout2->addWidget(botonMostrar);
     contentLayout2->addWidget(botonGuardarNota2);
     contentLayout2->addWidget(botonEliminarNota2);
@@ -592,8 +626,14 @@ Ventana::Ventana(QWidget *parent)
     contentLayout2->addWidget(etiquetaNombre);
     contentLayout2->addWidget(etiquetaAccion);
     contentLayout2->addStretch(1);
+    contentLayout2->addWidget(etiquetaFechaModificacion);
     //contentLayout->setMargin(0);
     contentLayout->addLayout(contentLayout2);
+    // CONTENT LAYOUT 3
+    //contentLayout3->addWidget(etiquetaFechaCreacion);
+    //contentLayout3->addStretch(1);
+    //contentLayout3->addWidget(etiquetaFechaModificacion);
+    //contentLayout->addLayout(contentLayout3);
     contentLayout->addWidget(contenidoNota);
 
 
@@ -623,6 +663,7 @@ Ventana::Ventana(QWidget *parent)
     configuracionLayout->addWidget(botonSeleccionarRutaBoveda);
     configuracionLayout->addWidget(botonSeleccionarNombreBoveda);
     configuracionLayout->addWidget(botonMostrarNotasOcultas);
+    configuracionLayout->addWidget(botonMostrarFechas);
     configuracionLayout->addStretch(1);
 
     // Layout principal de la ventana
@@ -658,6 +699,7 @@ Ventana::Ventana(QWidget *parent)
     connect(botonSeleccionarRutaBoveda, SIGNAL(clicked()), this, SLOT(seleccionarRutaBoveda()));
     connect(botonSeleccionarNombreBoveda, SIGNAL(clicked()), this, SLOT(seleccionarNombreBoveda()));
     connect(botonMostrarNotasOcultas, SIGNAL(clicked()), this, SLOT(mostrarNotasOcultass()));
+    connect(botonMostrarFechas, SIGNAL(clicked()), this, SLOT(mostrarFechas()));
 
 
     // actualizamos la lista de notas
@@ -878,7 +920,6 @@ void Ventana::guardarNota()
 
 }
 
-
 void Ventana::eliminarNota()
 {
     // verificamos si tenemos un item de la lista seleccionado
@@ -979,16 +1020,29 @@ void Ventana::seleccionarNota()
         // Actualizamos el nombre de la nota actual
         nombreNotaActual = nombreNota;
         // mostramos el nombre en consola
-        std::cout << nombreNota.toStdString() << std::endl;
+        //std::cout << nombreNota.toStdString() << std::endl;
         // luego obtenemos el contenido de la nota
-        //ManejoFicheros fichero;
-        //std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() /*+ ".txt"*/);
         std::string contenido = fichero.leerFichero(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak");
         // luego mostramos el contenido de la nota
-        //contenidoNota->setText(QString::fromStdString(contenido));
         contenidoNota->setHtml(QString::fromStdString(contenido));
         // luego mostramos la accion
         mostrarEtiquetaAccion("Nota seleccionada");
+
+        // en caso de que se deban mostrar las fechas de creacion y modificacion
+        if (mostrarFechasNotas)
+        {
+            // mostramos la fecha de creacion
+            //etiquetaFechaCreacion->setText(QString::fromStdString(fichero.extraerFechaCreacion(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak")));
+            // mostramos la fecha de modificacion
+            etiquetaFechaModificacion->setText(QString::fromStdString(fichero.extraerFechaModificacion(nombreCarpeta + nombreNota.toStdString() + "/" + nombreNota.toStdString() + ".tak")));
+        } else {
+            // mostramos la fecha de creacion
+            //etiquetaFechaCreacion->setText("");
+            // mostramos la fecha de modificacion
+            etiquetaFechaModificacion->setText("");
+
+        }
+
         // redimensionamos las imagenes de la nota
         redimensionarImagenes();
     } catch (const std::exception &e)
@@ -1004,7 +1058,7 @@ void Ventana::verificacionInicial(bool iteracion)
     ManejoFicheros fichero;
 
     // mostramos el estado de primeraVez
-    std::cout << "iteracion: " << iteracion << std::endl;
+    //std::cout << "iteracion: " << iteracion << std::endl;
     // vamos a verificar ficheros por lo que es necesario usar un try catch
     try {
 
@@ -1057,16 +1111,25 @@ void Ventana::verificacionInicial(bool iteracion)
             {
                 // creamos el archivo de configuracion
                 config += "nombreCarpetaBoveda: \"/" + boveda.toStdString() + "/\"\n";
-                fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+                //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
             } else {
                 // creamos el archivo de configuracion
                 config += "nombreCarpetaBoveda: \"notas/\"\n";
-                fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+                //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
             }
+
+            // añadimos una clausula para mostrar la fecha de modificacion por defecto no
+            config += "mostrarFechasNotas: \"false\"\n";
+            // añadimos una clausula para mostrar las notas ocultas por defecto no
+            //config += "mostrarNotasOcultas: \"false\"\n";
+
+            // luego creamos el archivo de configuracion
+            fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
+
         }
-        else {
-            std::cout << "Se encontro una carpeta de configuracion --- soy la linea 1066 " << std::endl;
-        }
+        // else {
+        //     std::cout << "Se encontro una carpeta de configuracion --- soy la linea 1066 " << std::endl;
+        // }
 
 
 
@@ -1074,11 +1137,6 @@ void Ventana::verificacionInicial(bool iteracion)
         // verificamos si existe el archivo de configuracion
         if (!fichero.existeFichero(*nombreCarpetaConfiguracion + "configuracion.tak"))
         {
-            // si no existe lo creamos
-            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", "./notas/");
-            //std::string config = "rutaCarpetaBoveda: \"./\"\n";
-            //config += "nombreCarpetaBoveda: \"notas/\"\n";
-            //fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
             // llamamos al metodo para actualizar la ruta de la carpeta de la boveda
             seleccionarRutaBoveda();
             // llamamos al metodo para actualizar el nombre de la carpeta de la boveda
@@ -1104,10 +1162,28 @@ void Ventana::verificacionInicial(bool iteracion)
         nombreCarpeta = nombreCarpeta.substr(0, nombreCarpeta.find("\""));
         //std::cout << "nombreCarpeta: " << nombreCarpeta << std::endl;
 
+
+        // --BLOQUE DE OBTENCION DE LA CLAUSULA PARA MOSTRAR LAS FECHAS DE MODIFICACION--
+        // Obtenemos la clausula para mostrar las fechas de modificacion
+
+        std::string mostrarFechas = fichero.extraerString(configuracion, nombreCarpeta + "\"\nmostrarFechasNotas: \"");
+        mostrarFechas = mostrarFechas.substr(0, mostrarFechas.find("\""));
+        std::cout << "mostrarFechas: " << mostrarFechas << std::endl;
+        if (mostrarFechas == "false")
+        {
+            mostrarFechasNotas = false;
+            etiquetaFechaModificacion->hide();
+        } else {
+            mostrarFechasNotas = true;
+        }
+
+
+
+
         // unimos la ruta de la carpeta de notas con el nombre de la carpeta de notas
         nombreCarpeta = rutaCarpetaNotas + nombreCarpeta;
-        std::cout << "Ruta de la carpeta de notas: " << rutaCarpetaNotas << std::endl;
-        std::cout << "nombreCarpeta: " << nombreCarpeta << std::endl;
+        // std::cout << "Ruta de la carpeta de notas: " << rutaCarpetaNotas << std::endl;
+        // std::cout << "nombreCarpeta: " << nombreCarpeta << std::endl;
 
         if (!fichero.existeCarpeta(nombreCarpeta))
         {
@@ -1287,7 +1363,12 @@ void Ventana::keyPressEvent(QKeyEvent *event){
        // si es así, llama al método para cambiar el color de fondo
        cambiarColorFondo();
        event->accept();
-    } else {
+    } else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_0) {
+       // si es así, llamamos al metodo para mostrar notas ocultas
+       mostrarNotasOcultas = !mostrarNotasOcultas;
+       actualizarListaNotas();
+       event->accept();
+    }else {
         event->ignore(); // Ignora el evento
     }
 
@@ -1667,6 +1748,11 @@ void Ventana::actualizarConfiguracion()
         else
             botonMostrarNotasOcultas->setText("Ocultar notas ocultas");
 
+        if (!mostrarFechasNotas)
+            botonMostrarFechas->setText("Mostrar fechas de las notas");
+        else
+            botonMostrarFechas->setText("Ocultar fechas de las notas");
+
         // mostramos el frame de configuracion
         mostrarConfiguracion();
 
@@ -1780,8 +1866,6 @@ void Ventana::seleccionarRutaBoveda()
 }
 
 
-
-
 void Ventana::seleccionarNombreBoveda()
 {
     // generamos un objeto de tipo ManejoFicheros
@@ -1808,6 +1892,9 @@ void Ventana::seleccionarNombreBoveda()
         while(!ok)
         {
             boveda = QInputDialog::getText(this, "Configuracion", "Nombre de la carpeta de notas:", QLineEdit::Normal, "", &ok);
+            // si no se ingreso un nombre retornamos
+            if (!ok)
+                return;
             // verificamos si se ingreso un nombre
             // vamos a crear un un fichero por lo que el nombre no debe contener caracteres especiales
             if (boveda.contains(QRegularExpression("[\\/:*?\"<>|]") ))
@@ -1835,6 +1922,20 @@ void Ventana::seleccionarNombreBoveda()
             fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", config);
 
         }
+        // mostramos la opcion de copiar las notas a la nueva boveda
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Copia de notas", "¿Deseas copiar las notas a la nueva carpeta?", QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            // copiamos las notas a la nueva carpeta
+            fichero.copiarFicheroNotas(rutaCarpetaNotas + nombreCarpetaNotas , rutaCarpetaNotas + "/" + boveda.toStdString());
+            std::cout << "origen" << rutaCarpetaNotas + nombreCarpetaNotas << std::endl;
+            std::cout << "destino" << rutaCarpetaNotas + "/" + boveda.toStdString() << std::endl;
+
+        } else {
+            // no copiamos las notas a la nueva carpeta
+        }
+
+
         // actualizamos la configuracion
         verificacionInicial(true); // indicamos que es una iteracion interna
         // actualizamos las etiquetas y botones de la configuracion
@@ -1864,6 +1965,64 @@ void Ventana::mostrarNotasOcultass()
         mostrarEtiquetaAccionConfiguracion("Acabas de ocultar las notas ocultas");
     else
         mostrarEtiquetaAccionConfiguracion("Acabas de mostrar las notas ocultas");
+    // actualizamos la configuracion
+    verificacionInicial(true); // indicamos que es una iteracion interna
+    // actualizamos las etiquetas y botones de la configuracion
+    actualizarConfiguracion();
+
+}
+
+
+void Ventana::mostrarFechas()
+{
+    mostrarFechasNotas = !mostrarFechasNotas;
+    // mostramos una etiqueta de accion indicando que acabamos de actualizar el estado de las notas ocultas
+    if (!mostrarFechasNotas)
+    {
+        // moficaos el texto del boton
+        //botonMostrarFechas->setText("Mostrar fechas");
+        mostrarEtiquetaAccionConfiguracion("Acabas de ocultar las fechas");
+        // ocultamos las fechas
+        // // ocultamos la fecha de creacion de la nota
+        // etiquetaFechaCreacion->hide();
+        // ocultamos la fecha de modificacion de la nota
+        etiquetaFechaModificacion->hide();
+    }
+    else
+    {
+        // moficaos el texto del boton
+        //botonMostrarFechas->setText("Ocultar fechas");
+        mostrarEtiquetaAccionConfiguracion("Acabas de mostrar las fechas");
+        // mostramos las fechas
+        // // mostramos la fecha de creacion de la nota
+        // etiquetaFechaCreacion->show();
+        // mostramos la fecha de modificacion de la nota
+        etiquetaFechaModificacion->show();
+    }
+
+    // procedemos a modificar el archivo de configuracion
+    // generamos un objeto de tipo ManejoFicheros
+    ManejoFicheros fichero;
+    // verificamos que exista la carpeta de configuracion
+    if (!fichero.existeCarpeta(*nombreCarpetaConfiguracion))
+    {
+        // si no existe llamamos a verificacionInicial
+        verificacionInicial(true); // indicamos que es una iteracion interna
+    }
+    // luego leemos el archivo de configuracion
+    std::string configuracion = fichero.leerFichero(*nombreCarpetaConfiguracion + "configuracion.tak");
+    std::string valor{mostrarFechasNotas ? "true" : "false"};
+    // buscamos la posicion de la palabra mostrarFechasNotas
+    int posicion = configuracion.find("mostrarFechasNotas: ");
+    // asignamos configuracion hasta la posicion de mostrarFechasNotas a configuracion
+    configuracion = configuracion.substr(0, posicion);
+    // agregamos el nuevo valor de mostrarFechasNotas
+    configuracion += "mostrarFechasNotas: \"" + valor + "\"\n";
+    // guardamos en el archivo de configuracion
+    fichero.escribirFichero(*nombreCarpetaConfiguracion + "configuracion.tak", configuracion);
+
+
+
     // actualizamos la configuracion
     verificacionInicial(true); // indicamos que es una iteracion interna
     // actualizamos las etiquetas y botones de la configuracion
