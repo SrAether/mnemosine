@@ -76,6 +76,7 @@ private:
     QPushButton *botonCambiarColor;
     QPushButton *botonCambiarColorFondo;
     QPushButton *botonConfiguracion;
+    QPushButton *botonImprimir;
 
 
     // --BOTON DE CONFIGURACION--
@@ -119,6 +120,7 @@ private:
     QPixmap *iconoCambiarColor;
     QPixmap *iconoCambiarColorFondo;
     QPixmap *iconoConfiguracion;
+    QPixmap *iconoImprimir;
     // --ICONOS DE CONFIGURACION--
     QPixmap *iconoSeleccionarRutaBoveda;
     QPixmap *iconoSeleccionarNombreBoveda;
@@ -156,7 +158,11 @@ private:
     QString redimensionarAnchoAltoImagenes(const QString &html);
     // booleano que me indica si puedo o no redimencionar una imagen
     bool puedoRedimensionarImagenes;
-
+    // --TEMPORIZADORES--
+    // temporizador para ocultar la etiqueta de accion de configuracion
+    QTimer *temporizadorAccionConfiguracion;
+    // temporizador para ocultar la etiqueta de accion
+    QTimer *temporizadorAccion;
 
 
 public:
@@ -189,6 +195,23 @@ private slots:
 
     // metodo para actualizar la ruta de la carpeta de notas
     void actualizarConfiguracion();
+
+    // --METODOS PARA CAMBIAR EL TAMAÑO DE LA FUENTE--
+    void aumentarTamFuente();
+    void disminuirTamFuente();
+
+    // --METODOS PARA SELECCIONAR LETRAS A LA IZQUIERDA Y DERECHA DEL CURSOR--
+    void seleccionarLetraIzquierda();
+    void seleccionarLetraDerecha();
+
+    // --METODOS PARA AUMENTAR Y DISMINUIR EL ZOOM DEL QTextEdit-- AUN NO SE USAN
+    void aumentarZoom();
+    void disminuirZoom();
+
+    // --METODO PARA IMPRIMIR--
+    void imprimir();
+
+
 
 
 

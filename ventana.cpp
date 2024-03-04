@@ -50,6 +50,9 @@
 #include <QResizeEvent>
 #include <QPixmap>
 #include <QDebug>
+// para imprimir
+#include <QPrinter>
+#include <QPrintDialog>
 
 // para sonido
 #include <QtMultimedia/QMediaPlayer>
@@ -94,6 +97,16 @@ Ventana::Ventana(QWidget *parent)
 
     // etiqueta de accion
     std::string accion = "Se acaba de abrir una nota";
+
+
+    // --TEMPORIZADORES--
+    // temporizador para etiqueta accion de configuracion
+    temporizadorAccionConfiguracion = new QTimer{this}; // creamos el temporizador para la accion de configuracion
+    temporizadorAccionConfiguracion->setSingleShot(true); // para que solo se ejecute una vez
+
+    // temporizador para etiqueta accion
+    temporizadorAccion = new QTimer{this}; // creamos el temporizador para la accion
+    temporizadorAccion->setSingleShot(true); // para que solo se ejecute una vez
 
 
     // luego creamos el frame que contendra todo
@@ -316,6 +329,7 @@ Ventana::Ventana(QWidget *parent)
     iconoCambiarColor = new QPixmap{"./iconos/botonCambiarColor.png"};
     iconoCambiarColorFondo = new QPixmap{"./iconos/botonCambiarColorFondo.png"};
     iconoConfiguracion = new QPixmap{"./iconos/botonConfiguracion.jpeg"};
+    iconoImprimir = new QPixmap{"./iconos/botonImprimir.jpeg"};
     // --ICONOS CONFIGURACION--
     iconoSeleccionarRutaBoveda = new QPixmap{"./iconos/botonCarpeta.jpeg"};
     iconoSeleccionarNombreBoveda = new QPixmap{"./iconos/botonBoveda.jpeg"};
@@ -328,9 +342,9 @@ Ventana::Ventana(QWidget *parent)
     // fijamos el tamaño de los botones (iconos de los mismos)
     tamBoton = 50;
 
-    // luego creamos los botones del menu
+    // --AREA DE INICIALIZACION DE BOTONES--
 
-    // boton ocultar
+    // boton ocultar <-- FRAME MENU
     botonOcultar = new QPushButton{frameMenu};
     botonOcultar->setGeometry(0, 0, tamBoton, tamBoton);
     botonOcultar->setFont(*fuente);
@@ -339,7 +353,7 @@ Ventana::Ventana(QWidget *parent)
     botonOcultar->setMaximumSize(tamBoton, tamBoton);
     botonOcultar->setToolTip("Ocultar lista de notas \n Ctrl + O");
 
-    // boton mostrar
+    // boton mostrar <-- FRAME CONTENIDO
     botonMostrar = new QPushButton{frameContenido};
     botonMostrar->setGeometry(5, 10, tamBoton, tamBoton);
     botonMostrar->setFont(*fuente);
@@ -350,7 +364,7 @@ Ventana::Ventana(QWidget *parent)
     botonMostrar->hide();
 
 
-    // boton nueva nota
+    // boton nueva nota <-- FRAME MENU
     botonNuevaNota = new QPushButton{frameMenu};
     botonNuevaNota->setGeometry(0, 50, tamBoton, tamBoton);
     botonNuevaNota->setFont(*fuente);
@@ -359,7 +373,7 @@ Ventana::Ventana(QWidget *parent)
     botonNuevaNota->setMaximumSize(tamBoton, tamBoton);
     botonNuevaNota->setToolTip("Nueva nota \n Ctrl + N");
 
-    // boton guardar nota
+    // boton guardar nota <-- FRAME MENU
     botonGuardarNota = new QPushButton{frameMenu};
     botonGuardarNota->setGeometry(0, 100, tamBoton, tamBoton);
     botonGuardarNota->setFont(*fuente);
@@ -368,7 +382,7 @@ Ventana::Ventana(QWidget *parent)
     botonGuardarNota->setMaximumSize(tamBoton, tamBoton);
     botonGuardarNota->setToolTip("Guardar \n Ctrl + S");
 
-    // boton guardar nota 2
+    // boton guardar nota 2 <-- FRAME CONTENIDO
     botonGuardarNota2 = new QPushButton{frameContenido};
     botonGuardarNota2->setGeometry(0, 100, tamBoton, tamBoton);
     botonGuardarNota2->setFont(*fuente);
@@ -378,7 +392,7 @@ Ventana::Ventana(QWidget *parent)
     botonGuardarNota2->setToolTip("Guardar \n Ctrl + S");
     botonGuardarNota2->hide();
 
-    // boton eliminar nota
+    // boton eliminar nota <-- FRAME MENU
     botonEliminarNota = new QPushButton{frameMenu};
     botonEliminarNota->setGeometry(0, 150, tamBoton , tamBoton);
     botonEliminarNota->setFont(*fuente);
@@ -387,7 +401,7 @@ Ventana::Ventana(QWidget *parent)
     botonEliminarNota->setMaximumSize(tamBoton, tamBoton);
     botonEliminarNota->setToolTip("Eliminar nota \n Ctrl + E");
 
-    // boton eliminar nota 2
+    // boton eliminar nota 2 <-- FRAME CONTENIDO
     botonEliminarNota2 = new QPushButton{frameContenido};
     botonEliminarNota2->setGeometry(0, 150, tamBoton, tamBoton);
     botonEliminarNota2->setFont(*fuente);
@@ -397,7 +411,7 @@ Ventana::Ventana(QWidget *parent)
     botonEliminarNota2->setToolTip("Eliminar nota \n Ctrl + E");
     botonEliminarNota2->hide();
 
-    // boton para agregar imagen
+    // boton para agregar imagen <-- FRAME MENU
     botonAgregarImagen = new QPushButton{frameMenu};
     botonAgregarImagen->setGeometry(0, 200, tamBoton, tamBoton);
     botonAgregarImagen->setFont(*fuente);
@@ -406,7 +420,7 @@ Ventana::Ventana(QWidget *parent)
     botonAgregarImagen->setMaximumSize(tamBoton, tamBoton);
     botonAgregarImagen->setToolTip("Insertar imagen \n Ctrl + I");
 
-    // boton para agregar imagen 2
+    // boton para agregar imagen 2 <-- FRAME CONTENIDO
     botonAgregarImagen2 = new QPushButton{frameContenido};
     botonAgregarImagen2->setGeometry(0, 200, tamBoton, tamBoton);
     botonAgregarImagen2->setFont(*fuente);
@@ -416,7 +430,7 @@ Ventana::Ventana(QWidget *parent)
     botonAgregarImagen2->setToolTip("Insertar imagen \n Ctrl + I");
     botonAgregarImagen2->hide();
 
-    // boton para cambiar tipo de texto
+    // boton para cambiar la fuente <-- FRAME CONTENIDO
     botonCambiarFuente = new QPushButton{frameContenido};
     botonCambiarFuente->setGeometry(0, 250, tamBoton, tamBoton);
     botonCambiarFuente->setFont(*fuente);
@@ -426,7 +440,7 @@ Ventana::Ventana(QWidget *parent)
     botonCambiarFuente->setToolTip("Tipo de fuente \n Ctrl + F");
     botonCambiarFuente->hide();
 
-    // boton para cambiar color de texto
+    // boton para cambiar color de texto <-- FRAME CONTENIDO
     botonCambiarColor = new QPushButton{frameContenido};
     botonCambiarColor->setGeometry(0, 300, tamBoton, tamBoton);
     botonCambiarColor->setFont(*fuente);
@@ -436,7 +450,7 @@ Ventana::Ventana(QWidget *parent)
     botonCambiarColor->setToolTip("Color de texto \n Ctrl + G");
     botonCambiarColor->hide();
 
-    // boton para cambiar color de fondo
+    // boton para cambiar color de fondo (resaltar texto) <-- FRAME CONTENIDO
     botonCambiarColorFondo = new QPushButton{frameContenido};
     botonCambiarColorFondo->setGeometry(0, 350, tamBoton, tamBoton);
     botonCambiarColorFondo->setFont(*fuente);
@@ -446,8 +460,18 @@ Ventana::Ventana(QWidget *parent)
     botonCambiarColorFondo->setToolTip("Resaltar texto \n Ctrl + H");
     botonCambiarColorFondo->hide();
 
+    // boton para imprimir <-- FRAME CONTENIDO
+    botonImprimir = new QPushButton{frameContenido};
+    botonImprimir->setGeometry(0, 400, tamBoton, tamBoton);
+    botonImprimir->setFont(*fuente);
+    botonImprimir->setIcon(QIcon{*iconoImprimir});
+    botonImprimir->setIconSize(QSize{tamBoton - 5, tamBoton - 5});
+    botonImprimir->setMaximumSize(tamBoton, tamBoton);
+    botonImprimir->setToolTip("Imprimir \n Ctrl + P");
+    botonImprimir->hide();
 
-    // boton para configuracion
+
+    // boton para configuracion <-- FRAME CONTENIDO
     botonConfiguracion = new QPushButton{frameContenido};
     botonConfiguracion->setGeometry(0, 400, tamBoton, tamBoton);
     botonConfiguracion->setFont(*fuente);
@@ -622,6 +646,7 @@ Ventana::Ventana(QWidget *parent)
     contentLayout2->addWidget(botonCambiarFuente);
     contentLayout2->addWidget(botonCambiarColor);
     contentLayout2->addWidget(botonCambiarColorFondo);
+    contentLayout2->addWidget(botonImprimir);
     contentLayout2->addWidget(botonConfiguracion);
     contentLayout2->addWidget(etiquetaNombre);
     contentLayout2->addWidget(etiquetaAccion);
@@ -700,13 +725,18 @@ Ventana::Ventana(QWidget *parent)
     connect(botonSeleccionarNombreBoveda, SIGNAL(clicked()), this, SLOT(seleccionarNombreBoveda()));
     connect(botonMostrarNotasOcultas, SIGNAL(clicked()), this, SLOT(mostrarNotasOcultass()));
     connect(botonMostrarFechas, SIGNAL(clicked()), this, SLOT(mostrarFechas()));
+    connect(botonImprimir, SIGNAL(clicked()), this, SLOT(imprimir()));
 
+
+    // CONEXION DE TEMPORIZADORES DE ETIQUETAS
+    connect(temporizadorAccionConfiguracion, SIGNAL(timeout()), this, SLOT(ocultarEtiquetaAccionConfiguracion()));
+    connect(temporizadorAccion, SIGNAL(timeout()), this, SLOT(ocultarEtiquetaAccion()));
 
     // actualizamos la lista de notas
     verificacionInicial();
     actualizarListaNotas();
 
-
+    //setFocusPolicy(Qt::StrongFocus);
 }
 
 
@@ -724,6 +754,7 @@ void Ventana::ocultarMenu()
     botonCambiarFuente->show();
     botonCambiarColor->show();
     botonCambiarColorFondo->show();
+    botonImprimir->show();
     botonConfiguracion->show();
     etiquetaNombre->show();
 
@@ -758,6 +789,7 @@ void Ventana::mostrarMenu()
     botonCambiarColor->hide();
     botonCambiarColorFondo->hide();
     botonConfiguracion->hide();
+    botonImprimir->hide();
 
     // redimensionamos las imagenes
     redimensionarImagenes();
@@ -887,7 +919,6 @@ void Ventana::actualizarListaNotas()
     }
 
 }
-
 
 void Ventana::guardarNota()
 {
@@ -1304,9 +1335,6 @@ void Ventana::insertarImagen()
 
 }
 
-
-
-
 void Ventana::keyPressEvent(QKeyEvent *event){
     // Verifica si se presionó Control + S
     if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_S) {
@@ -1368,13 +1396,51 @@ void Ventana::keyPressEvent(QKeyEvent *event){
        mostrarNotasOcultas = !mostrarNotasOcultas;
        actualizarListaNotas();
        event->accept();
-    }else {
+    } else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Equal){
+       // si es así, aumentamos el tamaño de la fuente Qt::Key_Plus
+       aumentarTamFuente();
+       event->accept();
+    } else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Minus){
+       // si es así, reducimos el tamaño de la fuente
+       disminuirTamFuente();
+       event->accept();
+    } else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_P){
+       // si es así, imprimimos la nota
+       imprimir();
+       event->accept();
+    } else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Up)
+    {
+       // si es así, seleccionamos la letra siguiente partiendo del cursor
+       // mostramos en consola que estamos intentando usar el atajo
+       //std::cout << "seleccionando letra derecha" << std::endl;
+       //seleccionarLetraDerecha();
+       aumentarZoom();
+       event->accept();
+
+    } else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Down)
+    {
+       // si es así, seleccionamos la letra siguiente partiendo del cursor
+       // mostramos en consola que estamos intentando usar el atajo
+       //std::cout << "seleccionando letra izquierda" << std::endl;
+       //seleccionarLetraIzquierda();
+       disminuirZoom();
+       event->accept();
+
+    } else {
+       // muestra que tecla se presiono
+       std::cout << event->key() << std::endl;
         event->ignore(); // Ignora el evento
     }
-
+    // verificamos si se presiono la tecla control sumada a la tecla flecha derecha
+    // if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Right) {
+    //     // si es así, llamamos al metodo para seleccionar la nota siguiente
+    //     seleccionarNotaSiguiente();
+    //     event->accept();
+    // }
+    // control + flecha izquierda
+    // else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Left) {
 
 }
-
 
 void Ventana::cambiarFuente()
 {
@@ -1431,7 +1497,77 @@ void Ventana::cambiarFuente()
     }
 }
 
+void Ventana::aumentarTamFuente()
+{
+    // Verificar si hay un ítem seleccionado en listaNotas
+    if (!listaNotas->currentItem())
+    {
+        // No hay nota seleccionada
+        mostrarEtiquetaAccion("No hay una nota seleccionada");
+        return;
+    }
 
+    // Obtener el cursor de texto actual
+    QTextCursor cursor = contenidoNota->textCursor();
+
+    // Obtener el formato de caracteres actual
+    QTextCharFormat formato = cursor.charFormat();
+
+    // Aumentar el tamaño de la fuente en 1
+    formato.setFontPointSize(formato.fontPointSize() + 1);
+
+    // Aplicar el nuevo formato al cursor
+    cursor.setCharFormat(formato);
+
+    // Aplicar el cursor actualizado
+    contenidoNota->setTextCursor(cursor);
+
+    // Devolver el foco a contenidoNota
+    contenidoNota->setFocus();
+
+    // Mostrar la acción
+    mostrarEtiquetaAccion("Tamaño de la fuente: " + QString::number(formato.fontPointSize()));
+}
+
+void Ventana::disminuirTamFuente()
+{
+    // Verificar si hay un ítem seleccionado en listaNotas
+    if (!listaNotas->currentItem())
+    {
+        // No hay nota seleccionada
+        mostrarEtiquetaAccion("No hay una nota seleccionada");
+        return;
+    }
+
+    // Obtener el cursor de texto actual
+    QTextCursor cursor = contenidoNota->textCursor();
+
+    // Obtener el formato de caracteres actual
+    QTextCharFormat formato = cursor.charFormat();
+
+    // verificamos si el tamaño de la fuente es menor a 4
+    if (formato.fontPointSize() <= 4)
+    {
+        // mostramos la accion
+        mostrarEtiquetaAccion("El tamaño de la fuente no puede ser menor a 4");
+        return;
+    }
+
+    // Disminuir el tamaño de la fuente en 1
+    formato.setFontPointSize(formato.fontPointSize() - 1);
+
+    // Aplicar el nuevo formato al cursor
+    cursor.setCharFormat(formato);
+
+    // Aplicar el cursor actualizado
+    contenidoNota->setTextCursor(cursor);
+
+    // Devolver el foco a contenidoNota
+    contenidoNota->setFocus();
+
+    // Mostrar la acción
+    mostrarEtiquetaAccion("Tamaño de la fuente: " + QString::number(formato.fontPointSize()));
+}
 
 void Ventana::cambiarColor()
 {
@@ -1475,7 +1611,6 @@ void Ventana::cambiarColor()
         mostrarEtiquetaAccion("Se cambio el color de la nota a " + colorSeleccionado.name());
     }
 }
-
 
 void Ventana::cambiarColorFondo()
 {
@@ -1531,7 +1666,10 @@ void Ventana::mostrarEtiquetaAccion(const QString &accion)
 {
     etiquetaAccion->setText(accion);
     etiquetaAccion->show();
-    QTimer::singleShot(3000, this, SLOT(ocultarEtiquetaAccion()));
+    //QTimer::singleShot(3000, this, SLOT(ocultarEtiquetaAccion()));
+    // iniciamos el temporizador
+    temporizadorAccion->start(3000);
+
 }
 
 void Ventana::ocultarEtiquetaAccionConfiguracion()
@@ -1545,7 +1683,9 @@ void Ventana::mostrarEtiquetaAccionConfiguracion(const QString &accion)
 {
     etiquetaAccionConfiguracion->setText(accion);
     etiquetaAccionConfiguracion->show();
-    QTimer::singleShot(3000, this, SLOT(ocultarEtiquetaAccionConfiguracion()));
+    //QTimer::singleShot(3000, this, SLOT(ocultarEtiquetaAccionConfiguracion()));
+    // iniciamos el temporizador
+    temporizadorAccionConfiguracion->start(3000);
 }
 
 Ventana::~Ventana()
@@ -1669,8 +1809,6 @@ QString Ventana::redimensionarAnchoAltoImagenes(const QString &html)
     return contenido;
 }
 
-
-
 void Ventana::actualizarConfiguracion()
 {
     // guardamos la nota que tenemos abierta en caso de tener una nota seleccionada
@@ -1761,6 +1899,60 @@ void Ventana::actualizarConfiguracion()
 
 
 
+    }
+}
+
+// --Metodo para imprimir la nota--
+void Ventana::imprimir()
+{
+    // verificamos si tenemos una nota seleccionada
+    if (listaNotas->currentItem() == nullptr)
+    {
+        // no hay una nota seleccionada
+        mostrarEtiquetaAccion("No hay una nota seleccionada");
+        return;
+    }
+    // guardamos la nota que tenemos abierta en caso de tener una nota seleccionada
+    guardarNota();
+    // extraemos el nombre de la nota
+    QString nombreNota = listaNotas->currentItem()->text();
+    // extraemos el contenido de la nota
+    QString contenido = contenidoNota->toPlainText();
+
+    // Creamos un documento de texto
+    QTextDocument document;
+    // Le asignamos el contenido de la nota
+    document.setPlainText(contenido);
+    // Obtenemos un cursor del documento
+    QTextCursor cursor(&document);
+    QTextCharFormat formato;
+    // establecemos un fondo negro para todo el documento
+    formato.setBackground(Qt::black);
+    cursor.select(QTextCursor::Document);
+    cursor.mergeCharFormat(formato);
+
+
+    // // Obtener la ruta de destino del archivo PDF
+    // QString rutaArchivoPDF = QFileDialog::getSaveFileName(this, "Guardar como PDF", "", "Archivos PDF (*.pdf)");
+
+    // if (!rutaArchivoPDF.isEmpty()) {
+    //     // Configurar la impresora para generar un archivo PDF
+    //     QPrinter printer(QPrinter::PrinterResolution);
+    //     printer.setOutputFormat(QPrinter::PdfFormat);
+    //     printer.setPaperSize(QPrinter::A4);
+    //     printer.setOutputFileName(rutaArchivoPDF);
+
+    //     // Imprimir el documento en el archivo PDF
+    //     document.print(&printer);
+    // }
+    // Configurar la impresora para permitir la selección del usuario
+    QPrintDialog printDialog;
+    if (printDialog.exec() == QDialog::Accepted) {
+        // Obtener la impresora seleccionada
+        QPrinter* printer = printDialog.printer();
+
+        // Imprimir el documento en la impresora seleccionada
+        document.print(printer);
     }
 }
 
@@ -2028,4 +2220,69 @@ void Ventana::mostrarFechas()
     // actualizamos las etiquetas y botones de la configuracion
     actualizarConfiguracion();
 
+}
+
+// --Metodos para aumentar y disminuir el zoom del QTextEdit--
+void Ventana::aumentarZoom()
+{
+    // aumentamos el zoom del QTextEdit
+    contenidoNota->zoomIn();
+
+    // mostramos una etiqueta de accion indicando que acabamos de aumentar el zoom
+    mostrarEtiquetaAccionConfiguracion("Acabas de aumentar el zoom");
+}
+
+void Ventana::disminuirZoom()
+{
+    // disminuimos el zoom del QTextEdit
+    contenidoNota->zoomOut();
+    // mostramos una etiqueta de accion indicando que acabamos de disminuir el zoom
+    mostrarEtiquetaAccionConfiguracion("Acabas de disminuir el zoom");
+}
+
+// -- METODOS PARA SELECCIONAR LETRAS A PARTIR DE LA POSICION DEL CURSOR --
+void Ventana::seleccionarLetraIzquierda()
+{
+    // verificamos si tenemos un item de la lista de notas seleccionado
+    if (listaNotas->currentItem() == nullptr)
+    {
+        // no hay una nota seleccionada
+        mostrarEtiquetaAccion("No hay una nota seleccioanda");
+        return;
+    }
+    // extraemos el cursor de la nota
+    QTextCursor cursor = contenidoNota->textCursor();
+    // verificamos si la posicion del cursor es mayor a 0
+    if (cursor.position() > 0)
+    {
+        // movemos el cursor a la izquierda
+        //cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, 1);
+        // seleccionamos la letra
+        cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, 1);
+
+        // colocamos el cursor en la posicion extraida
+        contenidoNota->setTextCursor(cursor);
+    }
+}
+
+void Ventana::seleccionarLetraDerecha()
+{
+    // verificamos si tenemos un item de la lista de notas seleccionado
+    if (listaNotas->currentItem() == nullptr)
+    {
+        // no hay una nota seleccionada
+        mostrarEtiquetaAccion("No hay una nota seleccioanda");
+        return;
+    }
+    // extraemos el cursor de la nota
+    QTextCursor cursor = contenidoNota->textCursor();
+    // verificamos si la posicion del cursor es menor al tamaño del texto
+    if (cursor.position() < contenidoNota->toPlainText().size())
+    {
+        // seleccionamos la letra
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
+        // colocamos el cursor en la posicion extraida
+        contenidoNota->setTextCursor(cursor);
+
+    }
 }
